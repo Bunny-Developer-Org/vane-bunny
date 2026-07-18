@@ -22,9 +22,15 @@ account (and optionally an Expo account for EAS builds).
 Much simpler than a typical app, since there's no account and no data ever
 leaves the device:
 
-- [ ] Play Console will likely still ask for a privacy policy URL even for a
-      no-collection app — a one-paragraph static page saying "Vane Bunny
-      collects no data; everything is stored only on your device" covers it
+- [x] `docs/privacy-policy.html` written — self-contained static page stating
+      the no-collection stance
+- [ ] **Fill in the placeholder contact email** in
+      `docs/privacy-policy.html` (search for `REPLACE_WITH_CONTACT_EMAIL`)
+      before publishing it anywhere
+- [ ] Host it somewhere with a stable URL for the Play Console listing —
+      easiest is enabling GitHub Pages on this repo (Settings → Pages →
+      deploy from branch → `/docs` folder), which would serve it at
+      `https://<you>.github.io/vane-bunny/privacy-policy.html`
 - [ ] Fill out Play Console's **Data safety** section as **"No data
       collected"** — accurate here since there's no account, no analytics,
       no crash reporting, no network calls at all
