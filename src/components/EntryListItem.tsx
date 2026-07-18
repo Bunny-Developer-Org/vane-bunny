@@ -1,0 +1,57 @@
+import { StyleSheet, Text, View } from 'react-native';
+import { colors } from '../theme/colors';
+import { radii, spacing } from '../theme';
+import { scoreColor } from '../theme/score';
+import { formatTime } from '../utils/date';
+import type { MoodEntry } from '../types';
+
+export function EntryListItem({ entry }: { entry: MoodEntry }) {
+  return (
+    <View style={styles.row}>
+      <View style={[styles.badge, { backgroundColor: scoreColor(entry.score) }]}>
+        <Text style={styles.badgeText}>{entry.score}</Text>
+      </View>
+      <View style={styles.body}>
+        {entry.note ? <Text style={styles.note}>{entry.note}</Text> : null}
+        <Text style={styles.time}>{formatTime(entry.timestamp)}</Text>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    gap: spacing.md,
+  },
+  badge: {
+    width: 36,
+    height: 36,
+    borderRadius: radii.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeText: {
+    color: colors.white,
+    fontWeight: '700',
+    fontSize: 15,
+  },
+  body: {
+    flex: 1,
+  },
+  note: {
+    fontSize: 15,
+    color: colors.ink,
+    marginBottom: 2,
+  },
+  time: {
+    fontSize: 12,
+    color: colors.inkMuted,
+  },
+});
