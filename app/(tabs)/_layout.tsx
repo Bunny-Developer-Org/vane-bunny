@@ -1,6 +1,14 @@
 import { Tabs } from 'expo-router';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/theme';
+
+// Bigger than the library's own default UIKit content height (49) to leave
+// room for our bold 12px label's extra line-height; anything added on top of
+// this must go equally into height and paddingBottom or the label gets
+// squeezed out of the remaining space.
+const TAB_BAR_CONTENT_HEIGHT = 58;
+const TAB_BAR_BUFFER = 8;
 
 function TabDot({ focused, color, inactiveColor }: { focused: boolean; color: string; inactiveColor: string }) {
   return (
@@ -17,6 +25,7 @@ function TabDot({ focused, color, inactiveColor }: { focused: boolean; color: st
 
 export default function TabsLayout() {
   const { palette } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -26,11 +35,8 @@ export default function TabsLayout() {
         tabBarStyle: {
           backgroundColor: palette.surface,
           borderTopColor: palette.border,
-          // The default tab bar height budgets for the default 10px label
-          // font; our bumped-up 12px bold label needs a bit more room or
-          // its own fixed-height inner slot clips the text's descenders.
-          height: 64,
-          paddingTop: 6,
+          height: TAB_BAR_CONTENT_HEIGHT + insets.bottom + TAB_BAR_BUFFER,
+          paddingBottom: insets.bottom + TAB_BAR_BUFFER,
         },
         tabBarLabelStyle: { fontSize: 12, fontWeight: '600', lineHeight: 16 },
       }}
