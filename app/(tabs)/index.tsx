@@ -151,6 +151,7 @@ function createStyles(colors: Palette) {
       fontWeight: '600',
       color: colors.ink,
       marginBottom: spacing.lg,
+      textAlign: 'center',
     },
     todayStats: {
       flexDirection: 'row',
