@@ -118,7 +118,7 @@ export default function Log() {
         <Toast
           message={thankYou}
           accentColor={palette.accents.checkIn}
-          bottom={insets.bottom + spacing.lg}
+          insetBottom={insets.bottom}
         />
       ) : null}
     </KeyboardAvoidingView>

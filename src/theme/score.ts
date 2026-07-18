@@ -5,6 +5,14 @@ function hexToRgb(hex: string) {
   return { r: (value >> 16) & 255, g: (value >> 8) & 255, b: value & 255 };
 }
 
+// Multiplies each channel toward black — used where a UI element needs to
+// read as a darker shade of an existing accent color rather than a new color.
+export function darken(hex: string, amount: number): string {
+  const { r, g, b } = hexToRgb(hex);
+  const factor = 1 - amount;
+  return `rgb(${Math.round(r * factor)}, ${Math.round(g * factor)}, ${Math.round(b * factor)})`;
+}
+
 function lerp(a: number, b: number, t: number) {
   return Math.round(a + (b - a) * t);
 }

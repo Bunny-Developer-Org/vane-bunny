@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Animated, StyleSheet, Text } from 'react-native';
-import { radii, spacing } from '../theme';
+import { spacing } from '../theme';
+import { darken } from '../theme/score';
 
 interface ToastProps {
   message: string;
   accentColor: string;
-  bottom: number;
+  /** Safe-area bottom inset, so text clears the home indicator without leaving a gap below the bar. */
+  insetBottom: number;
 }
 
-export function Toast({ message, accentColor, bottom }: ToastProps) {
+export function Toast({ message, accentColor, insetBottom }: ToastProps) {
   const [opacity] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
@@ -22,9 +24,15 @@ export function Toast({ message, accentColor, bottom }: ToastProps) {
   return (
     <Animated.View
       pointerEvents="none"
-      style={[styles.toast, { borderColor: accentColor, bottom, opacity }]}
+      style={[
+        styles.toast,
+        {
+          backgroundColor: darken(accentColor, 0.4),
+          paddingBottom: spacing.sm + insetBottom,
+          opacity,
+        },
+      ]}
     >
-      <Animated.View style={[styles.dot, { backgroundColor: accentColor }]} />
       <Text style={styles.text}>{message}</Text>
     </Animated.View>
   );
@@ -33,29 +41,15 @@ export function Toast({ message, accentColor, bottom }: ToastProps) {
 const styles = StyleSheet.create({
   toast: {
     position: 'absolute',
-    left: spacing.xl,
-    right: spacing.xl,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderRadius: radii.md,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    paddingTop: spacing.sm,
+    paddingHorizontal: spacing.xl,
   },
   text: {
-    flex: 1,
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '500',
   },
