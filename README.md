@@ -42,13 +42,24 @@ Daily average/median are computed client-side from that day's entries on every r
 
 ## Install and run
 
+Requires Node 20.19.4+, 22.13.0+, or 24.3.0+ (whatever React Native 0.86 supports — see `package.json`'s `engines` field). The exact version this project is developed against is pinned in `.nvmrc`; run `nvm use` to switch to it.
+
 ```
+nvm use             # optional, matches .nvmrc
 npm install
 npm run web        # http://localhost:8081
 npm run android     # requires an emulator or device + Expo dev client / Expo Go
 ```
 
 No environment variables, no setup steps beyond `npm install` — there's nothing external to configure.
+
+### Tests
+
+```
+npm test
+```
+
+Unit tests cover the pure logic in `src/utils/stats.ts` and `src/utils/date.ts` (average/median edge cases, local-timezone day bucketing, day-label formatting) via Jest + ts-jest — no React Native rendering involved, so there's no `jest-expo` dependency to manage.
 
 ## Building for Android (EAS)
 

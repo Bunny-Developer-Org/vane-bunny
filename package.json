@@ -2,6 +2,9 @@
   "name": "vane-bunny",
   "version": "1.0.0",
   "main": "expo-router/entry",
+  "engines": {
+    "node": "^20.19.4 || ^22.13.0 || ^24.3.0 || >= 25.0.0"
+  },
   "dependencies": {
     "@expo/metro-runtime": "~57.0.4",
     "@react-native-async-storage/async-storage": "^3.1.1",
@@ -19,8 +22,11 @@
     "react-native-web": "^0.21.2"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.2.2",
     "eas-cli": "^21.0.2",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.11",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -28,6 +34,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "test": "jest",
     "build:dev": "eas build --platform android --profile development",
     "build:preview": "eas build --platform android --profile preview",
     "build:production": "eas build --platform android --profile production",
