@@ -77,10 +77,15 @@ export function Toast({ message, accentColor, insetBottom }: ToastProps) {
 const styles = StyleSheet.create({
   toast: {
     position: 'absolute',
+    // left+right alone already span the box edge-to-edge unambiguously; adding
+    // width: '100%' on top over-constrains it (left/right/width all set), so
+    // the browser silently drops `right` and resolves the edge from a
+    // percentage instead — which can round a fraction of a pixel off from the
+    // true edge once the transform animation promotes this to its own
+    // compositing layer, showing up as a flickering hairline gap.
     left: 0,
     right: 0,
     bottom: 0,
-    width: '100%',
     paddingTop: spacing.sm,
     paddingHorizontal: spacing.xl,
   },
