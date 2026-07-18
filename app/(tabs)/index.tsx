@@ -114,13 +114,7 @@ export default function Log() {
         />
       </ScrollView>
 
-      {thankYou ? (
-        <Toast
-          message={thankYou}
-          accentColor={palette.accents.checkIn}
-          insetBottom={insets.bottom}
-        />
-      ) : null}
+      <Toast message={thankYou} accentColor={palette.accents.checkIn} insetBottom={insets.bottom} />
     </KeyboardAvoidingView>
   );
 }
