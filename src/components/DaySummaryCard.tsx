@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { pluralEntryKey, useI18n } from '../i18n';
 import { useTheme, radii, spacing, type Palette } from '../theme';
 import { scoreColor } from '../theme/score';
 import { formatDayLabel } from '../utils/date';
@@ -11,6 +12,7 @@ interface DaySummaryCardProps {
 
 export function DaySummaryCard({ day, onPress }: DaySummaryCardProps) {
   const { palette } = useTheme();
+  const { language, t } = useI18n();
   const styles = createStyles(palette);
 
   return (
@@ -21,19 +23,19 @@ export function DaySummaryCard({ day, onPress }: DaySummaryCardProps) {
     >
       <View style={[styles.dot, { backgroundColor: scoreColor(day.average, palette) }]} />
       <View style={styles.info}>
-        <Text style={styles.dayLabel}>{formatDayLabel(day.dateKey)}</Text>
+        <Text style={styles.dayLabel}>{formatDayLabel(day.dateKey, language)}</Text>
         <Text style={styles.entryCount}>
-          {day.count} {day.count === 1 ? 'entry' : 'entries'}
+          {day.count} {t(pluralEntryKey(day.count, language))}
         </Text>
       </View>
       <View style={styles.stats}>
         <View style={styles.statBlock}>
           <Text style={styles.statValue}>{day.average}</Text>
-          <Text style={styles.statLabel}>avg</Text>
+          <Text style={styles.statLabel}>{t('common.avg')}</Text>
         </View>
         <View style={styles.statBlock}>
           <Text style={styles.statValue}>{day.median}</Text>
-          <Text style={styles.statLabel}>median</Text>
+          <Text style={styles.statLabel}>{t('common.median')}</Text>
         </View>
       </View>
     </Pressable>

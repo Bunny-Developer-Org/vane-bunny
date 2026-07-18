@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useI18n } from '../src/i18n';
 import { useTheme, radii, spacing, type Palette } from '../src/theme';
 
 function Section({
@@ -23,6 +24,7 @@ function Section({
 export default function Privacy() {
   const insets = useSafeAreaInsets();
   const { palette } = useTheme();
+  const { t } = useI18n();
   const styles = createStyles(palette);
 
   return (
@@ -31,51 +33,41 @@ export default function Privacy() {
       contentContainerStyle={[styles.container, { paddingTop: insets.top + spacing.md }]}
     >
       <Pressable onPress={() => router.back()} hitSlop={12}>
-        <Text style={styles.back}>‹ Back</Text>
+        <Text style={styles.back}>{t('common.back')}</Text>
       </Pressable>
 
-      <Text style={styles.title}>Privacy Policy</Text>
-      <Text style={styles.updated}>Last updated: July 2026</Text>
+      <Text style={styles.title}>{t('privacy.title')}</Text>
+      <Text style={styles.updated}>{t('privacy.updated')}</Text>
 
       <View style={styles.summary}>
         <Text style={styles.summaryText}>
-          <Text style={styles.summaryStrong}>The short version: </Text>
-          Vane Bunny collects nothing. There&apos;s no account, no analytics, no crash reporting,
-          and no network access at all. Everything you enter stays only on your device.
+          <Text style={styles.summaryStrong}>{t('privacy.summaryStrong')}</Text>
+          {t('privacy.summaryText')}
         </Text>
       </View>
 
-      <Section title="What data we collect" styles={styles}>
-        None. Vane Bunny does not have user accounts, does not use analytics or advertising SDKs,
-        does not use crash-reporting services, and does not make any network requests. There is
-        nothing for us — the developer — to see, store, or receive.
+      <Section title={t('privacy.sectionCollectTitle')} styles={styles}>
+        {t('privacy.sectionCollectBody')}
       </Section>
 
-      <Section title="What the app stores, and where" styles={styles}>
-        When you log a mood check-in (a score from 1–10 and an optional short note), it&apos;s saved
-        using your device&apos;s local on-device storage only. It never leaves your device — not to
-        a server, not to us, not to anyone.
+      <Section title={t('privacy.sectionStoreTitle')} styles={styles}>
+        {t('privacy.sectionStoreBody')}
       </Section>
 
-      <Section title="Deleting your data" styles={styles}>
-        You can delete an individual check-in at any time from within the app. Uninstalling the app
-        removes all of its data from your device, since nothing exists anywhere else.
+      <Section title={t('privacy.sectionDeleteTitle')} styles={styles}>
+        {t('privacy.sectionDeleteBody')}
       </Section>
 
-      <Section title="Third parties" styles={styles}>
-        None are involved. Vane Bunny doesn&apos;t share data with anyone because it doesn&apos;t
-        collect or transmit any data in the first place.
+      <Section title={t('privacy.sectionThirdPartyTitle')} styles={styles}>
+        {t('privacy.sectionThirdPartyBody')}
       </Section>
 
-      <Section title="Children's privacy" styles={styles}>
-        Because the app collects no personal information from anyone, it does not knowingly collect
-        information from children either.
+      <Section title={t('privacy.sectionChildrenTitle')} styles={styles}>
+        {t('privacy.sectionChildrenBody')}
       </Section>
 
-      <Section title="Changes to this policy" styles={styles}>
-        If Vane Bunny&apos;s data practices ever change (for example, if a future version adds
-        optional cloud sync), this page will be updated first, and the change will be reflected in
-        the app&apos;s description in whichever app store it&apos;s distributed through.
+      <Section title={t('privacy.sectionChangesTitle')} styles={styles}>
+        {t('privacy.sectionChangesBody')}
       </Section>
     </ScrollView>
   );

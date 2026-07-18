@@ -14,6 +14,7 @@ import { MoodPicker } from '../../src/components/MoodPicker';
 import { PrimaryButton } from '../../src/components/PrimaryButton';
 import { Toast } from '../../src/components/Toast';
 import { useMoodEntries } from '../../src/hooks/useMoodEntries';
+import { pluralCheckInKey, useI18n } from '../../src/i18n';
 import { addMoodEntry } from '../../src/storage/moodStore';
 import { useTheme, radii, spacing, type Palette } from '../../src/theme';
 import { formatHeaderDate, toDateKey } from '../../src/utils/date';
@@ -24,6 +25,7 @@ const TOAST_DURATION_MS = 3500;
 export default function Log() {
   const insets = useSafeAreaInsets();
   const { palette } = useTheme();
+  const { language, t } = useI18n();
   const styles = createStyles(palette);
   const { days } = useMoodEntries();
   const [score, setScore] = useState<number | null>(null);
@@ -43,7 +45,7 @@ export default function Log() {
     setSaving(true);
     try {
       await addMoodEntry(score, note);
-      setThankYou(getThankYouMessage(score));
+      setThankYou(getThankYouMessage(score, language));
       setScore(null);
       setNote('');
       if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
@@ -67,25 +69,25 @@ export default function Log() {
       >
         <View style={styles.header}>
           <Logo size={18} />
-          <Text style={styles.date}>{formatHeaderDate(new Date())}</Text>
+          <Text style={styles.date}>{formatHeaderDate(new Date(), language)}</Text>
         </View>
 
-        <Text style={styles.prompt}>How are you, right now?</Text>
+        <Text style={styles.prompt}>{t('checkIn.prompt')}</Text>
 
         {today ? (
           <View style={styles.todayStats}>
             <View style={styles.todayStatBlock}>
               <Text style={styles.todayStatValue}>{today.average}</Text>
-              <Text style={styles.todayStatLabel}>avg today</Text>
+              <Text style={styles.todayStatLabel}>{t('checkIn.avgToday')}</Text>
             </View>
             <View style={styles.todayStatBlock}>
               <Text style={styles.todayStatValue}>{today.median}</Text>
-              <Text style={styles.todayStatLabel}>median</Text>
+              <Text style={styles.todayStatLabel}>{t('common.median')}</Text>
             </View>
             <View style={styles.todayStatBlock}>
               <Text style={styles.todayStatValue}>{today.count}</Text>
               <Text style={styles.todayStatLabel}>
-                {today.count === 1 ? 'check-in' : 'check-ins'}
+                {t(pluralCheckInKey(today.count, language))}
               </Text>
             </View>
           </View>
@@ -95,7 +97,7 @@ export default function Log() {
 
         <TextInput
           style={styles.note}
-          placeholder="Add a short note (optional)"
+          placeholder={t('checkIn.notePlaceholder')}
           placeholderTextColor={palette.inkFaint}
           value={note}
           onChangeText={setNote}
@@ -104,7 +106,7 @@ export default function Log() {
         />
 
         <PrimaryButton
-          label="Save check-in"
+          label={t('checkIn.save')}
           onPress={handleSave}
           disabled={score === null}
           loading={saving}

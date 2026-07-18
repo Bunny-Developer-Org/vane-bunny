@@ -3,6 +3,7 @@ import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-nativ
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DaySummaryCard } from '../../src/components/DaySummaryCard';
 import { useMoodEntries } from '../../src/hooks/useMoodEntries';
+import { useI18n } from '../../src/i18n';
 import { useTheme, spacing, type Palette } from '../../src/theme';
 import type { DaySummary } from '../../src/types';
 
@@ -10,6 +11,7 @@ export default function History() {
   const insets = useSafeAreaInsets();
   const { days, loading } = useMoodEntries();
   const { palette } = useTheme();
+  const { t } = useI18n();
   const styles = createStyles(palette);
 
   if (loading) {
@@ -31,11 +33,13 @@ export default function History() {
         days.length === 0 && styles.emptyContainer,
       ]}
       ItemSeparatorComponent={() => <View style={{ height: spacing.sm }} />}
-      ListHeaderComponent={days.length > 0 ? <Text style={styles.title}>History</Text> : null}
+      ListHeaderComponent={
+        days.length > 0 ? <Text style={styles.title}>{t('history.title')}</Text> : null
+      }
       ListEmptyComponent={
         <View style={styles.empty}>
-          <Text style={styles.emptyTitle}>Nothing here yet</Text>
-          <Text style={styles.emptyBody}>Your daily check-ins will show up here.</Text>
+          <Text style={styles.emptyTitle}>{t('history.emptyTitle')}</Text>
+          <Text style={styles.emptyBody}>{t('history.emptyBody')}</Text>
         </View>
       }
       renderItem={({ item }: { item: DaySummary }) => (

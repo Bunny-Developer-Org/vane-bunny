@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useI18n } from '../i18n';
 import { useTheme, radii, spacing, type Palette } from '../theme';
 import { scoreColor } from '../theme/score';
 
@@ -11,6 +12,7 @@ interface MoodPickerProps {
 
 export function MoodPicker({ value, onChange }: MoodPickerProps) {
   const { palette } = useTheme();
+  const { t } = useI18n();
   const styles = createStyles(palette);
 
   return (
@@ -24,7 +26,7 @@ export function MoodPicker({ value, onChange }: MoodPickerProps) {
         >
           {value ?? '–'}
         </Text>
-        <Text style={styles.displayLabel}>out of 10</Text>
+        <Text style={styles.displayLabel}>{t('moodPicker.outOf10')}</Text>
       </View>
       <View style={styles.grid}>
         {SCORES.map((score) => {
@@ -35,7 +37,7 @@ export function MoodPicker({ value, onChange }: MoodPickerProps) {
               key={score}
               onPress={() => onChange(score)}
               accessibilityRole="button"
-              accessibilityLabel={`Mood ${score} of 10`}
+              accessibilityLabel={t('moodPicker.moodLabel', { score })}
               accessibilityState={{ selected }}
               style={({ pressed }) => [
                 styles.pill,

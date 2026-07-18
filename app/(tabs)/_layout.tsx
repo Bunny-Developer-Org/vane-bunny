@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useI18n } from '../../src/i18n';
 import { useTheme } from '../../src/theme';
 
 // Bigger than the library's own default UIKit content height (49) to leave
@@ -33,6 +34,7 @@ function TabDot({
 
 export default function TabsLayout() {
   const { palette } = useTheme();
+  const { t } = useI18n();
   const insets = useSafeAreaInsets();
 
   return (
@@ -52,7 +54,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Check in',
+          title: t('tabs.checkIn'),
           tabBarActiveTintColor: palette.accents.checkIn,
           tabBarIcon: ({ focused }) => (
             <TabDot
@@ -66,7 +68,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="history"
         options={{
-          title: 'History',
+          title: t('history.title'),
           tabBarActiveTintColor: palette.accents.history,
           tabBarIcon: ({ focused }) => (
             <TabDot
@@ -80,7 +82,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
+          title: t('settings.title'),
           tabBarActiveTintColor: palette.accents.settings,
           tabBarIcon: ({ focused }) => (
             <TabDot

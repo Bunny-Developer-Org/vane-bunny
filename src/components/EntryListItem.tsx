@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useI18n } from '../i18n';
 import { useTheme, radii, spacing, type Palette } from '../theme';
 import { scoreColor } from '../theme/score';
 import { formatTime } from '../utils/date';
@@ -11,6 +12,7 @@ interface EntryListItemProps {
 
 export function EntryListItem({ entry, onDelete }: EntryListItemProps) {
   const { palette } = useTheme();
+  const { language, t } = useI18n();
   const styles = createStyles(palette);
 
   return (
@@ -20,11 +22,15 @@ export function EntryListItem({ entry, onDelete }: EntryListItemProps) {
       </View>
       <View style={styles.body}>
         {entry.note ? <Text style={styles.note}>{entry.note}</Text> : null}
-        <Text style={styles.time}>{formatTime(entry.timestamp)}</Text>
+        <Text style={styles.time}>{formatTime(entry.timestamp, language)}</Text>
       </View>
       {onDelete ? (
-        <Pressable onPress={onDelete} hitSlop={8} accessibilityLabel="Delete entry">
-          <Text style={styles.delete}>Delete</Text>
+        <Pressable
+          onPress={onDelete}
+          hitSlop={8}
+          accessibilityLabel={t('dayDetail.deleteEntryLabel')}
+        >
+          <Text style={styles.delete}>{t('common.delete')}</Text>
         </Pressable>
       ) : null}
     </View>

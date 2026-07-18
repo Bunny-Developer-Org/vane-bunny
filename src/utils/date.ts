@@ -1,5 +1,11 @@
+import type { LanguageCode } from '../i18n';
 import type { DaySummary, MoodEntry } from '../types';
 import { average, median, roundToOneDecimal } from './stats';
+
+const LOCALE_TAGS: Record<LanguageCode, string> = { en: 'en-US', pl: 'pl-PL' };
+const TODAY_LABEL: Record<LanguageCode, string> = { en: 'Today', pl: 'Dzisiaj' };
+const YESTERDAY_LABEL: Record<LanguageCode, string> = { en: 'Yesterday', pl: 'Wczoraj' };
+const DEFAULT_LANGUAGE: LanguageCode = 'en';
 
 // Local (device timezone) date key, so "today" lines up with what the user sees.
 export function toDateKey(date: Date): string {
@@ -38,24 +44,24 @@ export function groupEntriesByDay(entries: MoodEntry[]): DaySummary[] {
   return summaries.sort((a, b) => (a.dateKey < b.dateKey ? 1 : -1));
 }
 
-export function formatDayLabel(dateKey: string): string {
+export function formatDayLabel(dateKey: string, language: LanguageCode = DEFAULT_LANGUAGE): string {
   const today = toDateKey(new Date());
   const yesterday = toDateKey(new Date(Date.now() - 24 * 60 * 60 * 1000));
 
-  if (dateKey === today) return 'Today';
-  if (dateKey === yesterday) return 'Yesterday';
+  if (dateKey === today) return TODAY_LABEL[language];
+  if (dateKey === yesterday) return YESTERDAY_LABEL[language];
 
   const [year, month, day] = dateKey.split('-').map(Number);
   const date = new Date(year, month - 1, day);
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString(LOCALE_TAGS[language], {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
   });
 }
 
-export function formatTime(date: Date): string {
-  return date.toLocaleTimeString(undefined, {
+export function formatTime(date: Date, language: LanguageCode = DEFAULT_LANGUAGE): string {
+  return date.toLocaleTimeString(LOCALE_TAGS[language], {
     hour: 'numeric',
     minute: '2-digit',
   });
@@ -68,10 +74,25 @@ function ordinalSuffix(day: number): string {
   return 'th';
 }
 
-// "Saturday, July 18th" — Intl has no ordinal-day format, so build it by hand.
-export function formatHeaderDate(date: Date): string {
-  const weekday = date.toLocaleDateString(undefined, { weekday: 'long' });
-  const month = date.toLocaleDateString(undefined, { month: 'long' });
+function capitalize(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+// "Saturday, July 18th" in English — Intl has no ordinal-day format, so build
+// it by hand. Polish dates don't use ordinal suffixes ("18 lipca", not
+// "18-ty lipca"), so it gets its own simpler weekday/day/month order.
+export function formatHeaderDate(date: Date, language: LanguageCode = DEFAULT_LANGUAGE): string {
+  const locale = LOCALE_TAGS[language];
+  const weekday = capitalize(date.toLocaleDateString(locale, { weekday: 'long' }));
   const day = date.getDate();
+
+  if (language === 'pl') {
+    // day + month must be formatted together, not as separate calls — Polish
+    // month names are only genitive ("18 lipca") in that combined form;
+    // formatted alone they come back nominative ("lipiec").
+    const dayMonth = date.toLocaleDateString(locale, { day: 'numeric', month: 'long' });
+    return `${weekday}, ${dayMonth}`;
+  }
+  const month = date.toLocaleDateString(locale, { month: 'long' });
   return `${weekday}, ${month} ${day}${ordinalSuffix(day)}`;
 }

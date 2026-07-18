@@ -3,12 +3,14 @@ import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Logo } from '../../src/components/Logo';
+import { LANGUAGES, useI18n, type LanguageCode } from '../../src/i18n';
 import { useTheme, radii, spacing, type Palette } from '../../src/theme';
 import type { Palette as PaletteType } from '../../src/theme/palettes';
 
 export default function Settings() {
   const insets = useSafeAreaInsets();
   const { palette, palettes, setPaletteId } = useTheme();
+  const { language, setLanguage, t } = useI18n();
   const styles = createStyles(palette);
   const version = Constants.expoConfig?.version ?? '—';
 
@@ -21,9 +23,9 @@ export default function Settings() {
         <Logo size={18} />
       </View>
 
-      <Text style={styles.title}>Settings</Text>
+      <Text style={styles.title}>{t('settings.title')}</Text>
 
-      <Text style={styles.sectionLabel}>Appearance</Text>
+      <Text style={styles.sectionLabel}>{t('settings.appearance')}</Text>
       <View style={styles.paletteRow}>
         {palettes.map((option: PaletteType) => {
           const selected = option.id === palette.id;
@@ -47,23 +49,40 @@ export default function Settings() {
         })}
       </View>
 
-      <Text style={styles.sectionLabel}>About</Text>
+      <Text style={styles.sectionLabel}>{t('settings.language')}</Text>
+      <View style={styles.paletteRow}>
+        {LANGUAGES.map((option: { code: LanguageCode; label: string }) => {
+          const selected = option.code === language;
+          return (
+            <Pressable
+              key={option.code}
+              onPress={() => setLanguage(option.code)}
+              accessibilityRole="button"
+              accessibilityLabel={option.label}
+              accessibilityState={{ selected }}
+              style={[styles.paletteOption, selected && { borderColor: palette.accents.settings }]}
+            >
+              <Text style={styles.paletteName}>{option.label}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <Text style={styles.sectionLabel}>{t('settings.about')}</Text>
       <Pressable
         onPress={() => router.push('/privacy')}
         style={styles.row}
         accessibilityRole="button"
       >
-        <Text style={styles.rowLabel}>Privacy policy</Text>
+        <Text style={styles.rowLabel}>{t('settings.privacyPolicy')}</Text>
         <Text style={styles.rowChevron}>›</Text>
       </Pressable>
       <View style={styles.row}>
-        <Text style={styles.rowLabel}>Version</Text>
+        <Text style={styles.rowLabel}>{t('settings.version')}</Text>
         <Text style={styles.rowValue}>{version}</Text>
       </View>
 
-      <Text style={styles.footnote}>
-        Vane Bunny keeps everything on this device. No account, no analytics, no network calls.
-      </Text>
+      <Text style={styles.footnote}>{t('settings.footnote')}</Text>
     </ScrollView>
   );
 }
