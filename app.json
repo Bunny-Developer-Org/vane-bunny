@@ -39,6 +39,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "74d8b097-e4f3-46c1-b8de-3f2190fbb60e"
+      }
+    },
+    "owner": "pgradziels-team"
   }
 }
