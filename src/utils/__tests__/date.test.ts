@@ -1,4 +1,10 @@
-import { formatDayLabel, formatHeaderDate, formatTime, groupEntriesByDay, toDateKey } from '../date';
+import {
+  formatDayLabel,
+  formatHeaderDate,
+  formatTime,
+  groupEntriesByDay,
+  toDateKey,
+} from '../date';
 import type { MoodEntry } from '../../types';
 
 function entry(id: string, score: number, timestamp: Date, note?: string): MoodEntry {

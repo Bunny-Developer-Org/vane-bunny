@@ -12,4 +12,3 @@ export interface DaySummary {
   count: number;
   entries: MoodEntry[];
 }
-

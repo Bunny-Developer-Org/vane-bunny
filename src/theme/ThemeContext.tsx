@@ -26,14 +26,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   function setPaletteId(id: Palette['id']) {
     setPalette(getPaletteById(id));
     AsyncStorage.setItem(STORAGE_KEY, id).catch((error) =>
-      console.error('Failed to save theme preference', error)
+      console.error('Failed to save theme preference', error),
     );
   }
 
-  const value = useMemo<ThemeContextValue>(
-    () => ({ palette, palettes, setPaletteId }),
-    [palette]
-  );
+  const value = useMemo<ThemeContextValue>(() => ({ palette, palettes, setPaletteId }), [palette]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

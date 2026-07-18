@@ -21,7 +21,10 @@ function mix(hexA: string, hexB: string, t: number): string {
 // Soft, abstract gradient across the 1-10 range. No emoji, no traffic-light
 // coding. Takes the active palette's gradient stops so it follows theme
 // changes.
-export function scoreColor(score: number, palette: Pick<Palette, 'scoreLow' | 'scoreMid' | 'scoreHigh'>): string {
+export function scoreColor(
+  score: number,
+  palette: Pick<Palette, 'scoreLow' | 'scoreMid' | 'scoreHigh'>,
+): string {
   const clamped = Math.min(10, Math.max(1, score));
   const t = (clamped - 1) / 9;
   if (t <= 0.5) {

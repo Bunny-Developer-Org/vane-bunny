@@ -24,9 +24,7 @@ export function groupEntriesByDay(entries: MoodEntry[]): DaySummary[] {
 
   const summaries: DaySummary[] = [];
   for (const [dateKey, dayEntries] of byDay) {
-    const sorted = [...dayEntries].sort(
-      (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
-    );
+    const sorted = [...dayEntries].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
     const scores = sorted.map((entry) => entry.score);
     summaries.push({
       dateKey,

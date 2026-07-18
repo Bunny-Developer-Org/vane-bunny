@@ -10,7 +10,15 @@ import { useTheme } from '../../src/theme';
 const TAB_BAR_CONTENT_HEIGHT = 58;
 const TAB_BAR_BUFFER = 8;
 
-function TabDot({ focused, color, inactiveColor }: { focused: boolean; color: string; inactiveColor: string }) {
+function TabDot({
+  focused,
+  color,
+  inactiveColor,
+}: {
+  focused: boolean;
+  color: string;
+  inactiveColor: string;
+}) {
   return (
     <View
       style={{
@@ -47,7 +55,11 @@ export default function TabsLayout() {
           title: 'Check in',
           tabBarActiveTintColor: palette.accents.checkIn,
           tabBarIcon: ({ focused }) => (
-            <TabDot focused={focused} color={palette.accents.checkIn} inactiveColor={palette.inkFaint} />
+            <TabDot
+              focused={focused}
+              color={palette.accents.checkIn}
+              inactiveColor={palette.inkFaint}
+            />
           ),
         }}
       />
@@ -57,7 +69,11 @@ export default function TabsLayout() {
           title: 'History',
           tabBarActiveTintColor: palette.accents.history,
           tabBarIcon: ({ focused }) => (
-            <TabDot focused={focused} color={palette.accents.history} inactiveColor={palette.inkFaint} />
+            <TabDot
+              focused={focused}
+              color={palette.accents.history}
+              inactiveColor={palette.inkFaint}
+            />
           ),
         }}
       />
@@ -67,7 +83,11 @@ export default function TabsLayout() {
           title: 'Settings',
           tabBarActiveTintColor: palette.accents.settings,
           tabBarIcon: ({ focused }) => (
-            <TabDot focused={focused} color={palette.accents.settings} inactiveColor={palette.inkFaint} />
+            <TabDot
+              focused={focused}
+              color={palette.accents.settings}
+              inactiveColor={palette.inkFaint}
+            />
           ),
         }}
       />

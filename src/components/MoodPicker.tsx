@@ -46,7 +46,9 @@ export function MoodPicker({ value, onChange }: MoodPickerProps) {
                 pressed && styles.pressed,
               ]}
             >
-              <Text style={[styles.pillLabel, { color: selected ? palette.white : palette.inkMuted }]}>
+              <Text
+                style={[styles.pillLabel, { color: selected ? palette.white : palette.inkMuted }]}
+              >
                 {score}
               </Text>
             </Pressable>
