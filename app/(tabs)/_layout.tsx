@@ -26,8 +26,13 @@ export default function TabsLayout() {
         tabBarStyle: {
           backgroundColor: palette.surface,
           borderTopColor: palette.border,
+          // The default tab bar height budgets for the default 10px label
+          // font; our bumped-up 12px bold label needs a bit more room or
+          // its own fixed-height inner slot clips the text's descenders.
+          height: 64,
+          paddingTop: 6,
         },
-        tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
+        tabBarLabelStyle: { fontSize: 12, fontWeight: '600', lineHeight: 16 },
       }}
     >
       <Tabs.Screen
