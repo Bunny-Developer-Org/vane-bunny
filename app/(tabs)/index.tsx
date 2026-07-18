@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -22,9 +22,13 @@ export default function Log() {
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<number | null>(null);
+  const savingRef = useRef(false);
 
   async function handleSave() {
-    if (score === null) return;
+    // Synchronous guard: `saving` only disables the button after a
+    // re-render, which isn't fast enough to rule out a rapid double-tap.
+    if (score === null || savingRef.current) return;
+    savingRef.current = true;
     setSaving(true);
     try {
       await addMoodEntry(score, note);
@@ -35,6 +39,7 @@ export default function Log() {
     } catch (err) {
       console.error('Failed to save entry', err);
     } finally {
+      savingRef.current = false;
       setSaving(false);
     }
   }

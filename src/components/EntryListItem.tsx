@@ -1,11 +1,16 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../theme/colors';
 import { radii, spacing } from '../theme';
 import { scoreColor } from '../theme/score';
 import { formatTime } from '../utils/date';
 import type { MoodEntry } from '../types';
 
-export function EntryListItem({ entry }: { entry: MoodEntry }) {
+interface EntryListItemProps {
+  entry: MoodEntry;
+  onDelete?: () => void;
+}
+
+export function EntryListItem({ entry, onDelete }: EntryListItemProps) {
   return (
     <View style={styles.row}>
       <View style={[styles.badge, { backgroundColor: scoreColor(entry.score) }]}>
@@ -15,6 +20,11 @@ export function EntryListItem({ entry }: { entry: MoodEntry }) {
         {entry.note ? <Text style={styles.note}>{entry.note}</Text> : null}
         <Text style={styles.time}>{formatTime(entry.timestamp)}</Text>
       </View>
+      {onDelete ? (
+        <Pressable onPress={onDelete} hitSlop={8} accessibilityLabel="Delete entry">
+          <Text style={styles.delete}>Delete</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -53,5 +63,10 @@ const styles = StyleSheet.create({
   time: {
     fontSize: 12,
     color: colors.inkMuted,
+  },
+  delete: {
+    fontSize: 12,
+    color: colors.danger,
+    fontWeight: '600',
   },
 });

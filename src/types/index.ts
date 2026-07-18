@@ -13,8 +13,3 @@ export interface DaySummary {
   entries: MoodEntry[];
 }
 
-export interface UserProfile {
-  displayName: string | null;
-  email: string | null;
-  createdAt: Date;
-}

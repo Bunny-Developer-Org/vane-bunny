@@ -1,18 +1,51 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EntryListItem } from '../../src/components/EntryListItem';
 import { useMoodEntries } from '../../src/hooks/useMoodEntries';
+import { deleteMoodEntry } from '../../src/storage/moodStore';
 import { colors } from '../../src/theme/colors';
 import { spacing } from '../../src/theme';
 import { formatDayLabel } from '../../src/utils/date';
 
 export default function DayDetail() {
-  const { date } = useLocalSearchParams<{ date: string }>();
+  const { date: rawDate } = useLocalSearchParams<{ date: string }>();
+  // useLocalSearchParams's generic is a compile-time assertion only — a
+  // duplicate query param would actually make this a string[] at runtime.
+  const date = Array.isArray(rawDate) ? rawDate[0] : rawDate;
   const insets = useSafeAreaInsets();
   const { days, loading } = useMoodEntries();
 
   const day = days.find((d) => d.dateKey === date);
+
+  function confirmDelete(entryId: string) {
+    const runDelete = () => {
+      deleteMoodEntry(entryId).catch((err) => console.error('Failed to delete entry', err));
+    };
+
+    // react-native-web's Alert.alert() is a no-op — RN's Alert only has a
+    // real implementation on native, so web needs its own confirm path.
+    if (Platform.OS === 'web') {
+      if (window.confirm('Delete this entry? This can’t be undone.')) {
+        runDelete();
+      }
+      return;
+    }
+
+    Alert.alert('Delete this entry?', 'This can’t be undone.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete', style: 'destructive', onPress: runDelete },
+    ]);
+  }
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + spacing.md }]}>
@@ -55,7 +88,9 @@ export default function DayDetail() {
           }
           contentContainerStyle={styles.listContent}
           ItemSeparatorComponent={() => <View style={{ height: spacing.sm }} />}
-          renderItem={({ item }) => <EntryListItem entry={item} />}
+          renderItem={({ item }) => (
+            <EntryListItem entry={item} onDelete={() => confirmDelete(item.id)} />
+          )}
         />
       )}
     </View>
