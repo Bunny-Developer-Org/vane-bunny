@@ -2,7 +2,7 @@
 // Every palette provides the same keys so the rest of the app never has to
 // know which one is active; only the values differ.
 export interface Palette {
-  id: 'meadow' | 'clay' | 'dusk';
+  id: 'meadow' | 'ocean' | 'dusk';
   name: string;
   background: string;
   surface: string;
@@ -70,36 +70,36 @@ const meadow: Palette = {
   },
 };
 
-const clay: Palette = {
-  id: 'clay',
-  name: 'Clay',
-  background: '#FBF1E7',
+const ocean: Palette = {
+  id: 'ocean',
+  name: 'Ocean',
+  background: '#EEF3F8',
   surface: '#FFFFFF',
-  surfaceMuted: '#F3E3D2',
-  border: '#E9D2BC',
+  surfaceMuted: '#DCE6F0',
+  border: '#C7D7E6',
 
-  ink: '#3E2E24',
-  inkMuted: '#93796A',
-  inkFaint: '#C4AC9C',
+  ink: '#26333F',
+  inkMuted: '#6C8194',
+  inkFaint: '#A2B4C4',
 
-  sage: '#8FA285',
-  sageDark: '#6C8061',
-  sageMuted: '#E1E7D9',
+  sage: '#7FA0A6',
+  sageDark: '#557880',
+  sageMuted: '#DAE6E7',
 
-  clay: '#D08F65',
-  lavender: '#B49BC0',
+  clay: '#4F7BA6',
+  lavender: '#7B93C4',
 
-  scoreLow: '#A7B7C9',
-  scoreMid: '#CBB08E',
-  scoreHigh: '#C97D4C',
+  scoreLow: '#8FA9C0',
+  scoreMid: '#6E93B8',
+  scoreHigh: '#3E6E92',
 
-  danger: '#C05A4E',
+  danger: '#C15C56',
   white: '#FFFFFF',
 
   accents: {
-    checkIn: '#B06B4A',
-    history: '#6C8061',
-    settings: '#8F6D9E',
+    checkIn: '#3E6E92',
+    history: '#5B87A6',
+    settings: '#6C6FA6',
   },
 };
 
@@ -136,7 +136,7 @@ const dusk: Palette = {
   },
 };
 
-export const palettes: Palette[] = [meadow, clay, dusk];
+export const palettes: Palette[] = [meadow, ocean, dusk];
 export const defaultPalette = meadow;
 
 export function getPaletteById(id: string | null | undefined): Palette {
