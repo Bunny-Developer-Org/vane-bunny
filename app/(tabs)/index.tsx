@@ -160,7 +160,7 @@ function createStyles(colors: Palette) {
       paddingVertical: spacing.sm,
       paddingHorizontal: spacing.md,
       marginBottom: spacing.xl,
-      alignSelf: 'flex-start',
+      alignSelf: 'center',
     },
     todayStatBlock: {
       alignItems: 'flex-start',
