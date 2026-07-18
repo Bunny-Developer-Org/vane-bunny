@@ -55,18 +55,27 @@ project, a Google Cloud project, and a Google Play Developer account.
 
 ## 5. Android build & signing
 
-- [ ] Set up EAS (`npm install -g eas-cli`, `eas login`, `eas build:configure`)
-      — or build the native project manually if you'd rather not use EAS
-- [ ] Add an `eas.json` with at least a `production` build profile
-      (`app-bundle` output for Play Store)
-- [ ] Bump `version` / add `android.versionCode` in `app.json` before each
-      release
-- [ ] Run `eas build --platform android --profile production`
+- [x] Add `eas.json` with `development` / `preview` / `production` build
+      profiles (`production` outputs an `.aab` for the Play Store) and a
+      `submit.production` profile wired for `eas submit`
+- [x] Add `eas-cli` as a dev dependency and `build:dev` / `build:preview` /
+      `build:production` / `submit:android` npm scripts
+- [x] `cli.appVersionSource: "remote"` + `autoIncrement: true` on the
+      production profile — EAS manages `versionCode` for you, no manual
+      bumps needed in `app.json`
+- [ ] **Requires your Expo account** — `npx eas login`, then `npx eas init`
+      to create the EAS project and write `extra.eas.projectId` into
+      `app.json` (can't be done without your credentials)
+- [ ] Run `npm run build:production` (or `build:preview` first for a quick
+      installable APK to sanity-check on a device before a store build)
 - [ ] Enroll in **Play App Signing** when you create the app in Play Console
       (default and recommended) — grab the resulting SHA-1 from Play Console
       → Setup → App signing, and add it to the Android OAuth client from §3
       (Google Sign-In will fail in the Play-distributed build until this is
       done)
+- [ ] For `eas submit`, generate a Google Play service account JSON key
+      (Play Console → Setup → API access) and save it as
+      `google-service-account.json` in the project root (already gitignored)
 
 ## 6. Play Console listing
 

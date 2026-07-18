@@ -87,6 +87,20 @@ npx firebase-tools emulators:start --only auth,firestore
 
 Set `EXPO_PUBLIC_USE_FIREBASE_EMULATOR=true` in `.env` and restart the app — it will connect to the local Auth and Firestore emulators instead of your real project. The emulator UI is at `http://localhost:4000`.
 
+## Building for Android (EAS)
+
+Build profiles live in `eas.json` (`development`, `preview`, `production`) and `eas-cli` is a dev dependency, so:
+
+```
+npx eas login          # your Expo account
+npx eas init            # one-time: creates the EAS project, writes projectId into app.json
+npm run build:preview    # installable .apk for testing on a device
+npm run build:production # .aab for the Play Store, versionCode auto-incremented by EAS
+npm run submit:android   # uploads the latest production build to Play Console
+```
+
+`eas submit` needs a Google Play service account key saved as `google-service-account.json` in the project root (gitignored). See `TODO.md` for the full Play Store deployment checklist, including the Play App Signing / Google OAuth SHA-1 dependency.
+
 ## Design direction
 
 Muted, rounded, calm — the app deliberately avoids mood/emotion iconography (no emoji faces, no literal "tracker" branding). The 1–10 selector uses an abstract low-to-high color gradient instead.
