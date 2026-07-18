@@ -1,37 +1,65 @@
 import { Tabs } from 'expo-router';
 import { View } from 'react-native';
-import { colors } from '../../src/theme/colors';
+import { useTheme } from '../../src/theme';
 
-function TabDot({ focused }: { focused: boolean }) {
+function TabDot({ focused, color, inactiveColor }: { focused: boolean; color: string; inactiveColor: string }) {
   return (
     <View
       style={{
         width: 6,
         height: 6,
         borderRadius: 3,
-        backgroundColor: focused ? colors.sageDark : colors.inkFaint,
+        backgroundColor: focused ? color : inactiveColor,
       }}
     />
   );
 }
 
 export default function TabsLayout() {
+  const { palette } = useTheme();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.sageDark,
-        tabBarInactiveTintColor: colors.inkFaint,
+        tabBarInactiveTintColor: palette.inkFaint,
         tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopColor: colors.border,
+          backgroundColor: palette.surface,
+          borderTopColor: palette.border,
         },
         tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
-        tabBarIcon: ({ focused }) => <TabDot focused={focused} />,
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Check in' }} />
-      <Tabs.Screen name="history" options={{ title: 'History' }} />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Check in',
+          tabBarActiveTintColor: palette.accents.checkIn,
+          tabBarIcon: ({ focused }) => (
+            <TabDot focused={focused} color={palette.accents.checkIn} inactiveColor={palette.inkFaint} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="history"
+        options={{
+          title: 'History',
+          tabBarActiveTintColor: palette.accents.history,
+          tabBarIcon: ({ focused }) => (
+            <TabDot focused={focused} color={palette.accents.history} inactiveColor={palette.inkFaint} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarActiveTintColor: palette.accents.settings,
+          tabBarIcon: ({ focused }) => (
+            <TabDot focused={focused} color={palette.accents.settings} inactiveColor={palette.inkFaint} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

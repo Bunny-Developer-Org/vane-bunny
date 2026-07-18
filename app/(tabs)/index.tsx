@@ -9,20 +9,31 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Banner } from '../../src/components/Banner';
 import { Logo } from '../../src/components/Logo';
 import { MoodPicker } from '../../src/components/MoodPicker';
 import { PrimaryButton } from '../../src/components/PrimaryButton';
+import { useMoodEntries } from '../../src/hooks/useMoodEntries';
 import { addMoodEntry } from '../../src/storage/moodStore';
-import { colors } from '../../src/theme/colors';
-import { radii, spacing } from '../../src/theme';
+import { useTheme, radii, spacing, type Palette } from '../../src/theme';
+import { formatHeaderDate, toDateKey } from '../../src/utils/date';
+import { getThankYouMessage } from '../../src/utils/encouragement';
+
+const BANNER_DURATION_MS = 3500;
 
 export default function Log() {
   const insets = useSafeAreaInsets();
+  const { palette } = useTheme();
+  const styles = createStyles(palette);
+  const { days } = useMoodEntries();
   const [score, setScore] = useState<number | null>(null);
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
-  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const [thankYou, setThankYou] = useState<string | null>(null);
   const savingRef = useRef(false);
+  const bannerTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const today = days.find((day) => day.dateKey === toDateKey(new Date()));
 
   async function handleSave() {
     // Synchronous guard: `saving` only disables the button after a
@@ -32,10 +43,11 @@ export default function Log() {
     setSaving(true);
     try {
       await addMoodEntry(score, note);
+      setThankYou(getThankYouMessage(score));
       setScore(null);
       setNote('');
-      setSavedAt(Date.now());
-      setTimeout(() => setSavedAt(null), 2500);
+      if (bannerTimeoutRef.current) clearTimeout(bannerTimeoutRef.current);
+      bannerTimeoutRef.current = setTimeout(() => setThankYou(null), BANNER_DURATION_MS);
     } catch (err) {
       console.error('Failed to save entry', err);
     } finally {
@@ -55,16 +67,38 @@ export default function Log() {
       >
         <View style={styles.header}>
           <Logo size={18} />
+          <Text style={styles.date}>{formatHeaderDate(new Date())}</Text>
         </View>
 
         <Text style={styles.prompt}>How are you, right now?</Text>
+
+        {thankYou ? <Banner message={thankYou} accentColor={palette.accents.checkIn} /> : null}
+
+        {today ? (
+          <View style={styles.todayStats}>
+            <View style={styles.todayStatBlock}>
+              <Text style={styles.todayStatValue}>{today.average}</Text>
+              <Text style={styles.todayStatLabel}>avg today</Text>
+            </View>
+            <View style={styles.todayStatBlock}>
+              <Text style={styles.todayStatValue}>{today.median}</Text>
+              <Text style={styles.todayStatLabel}>median</Text>
+            </View>
+            <View style={styles.todayStatBlock}>
+              <Text style={styles.todayStatValue}>{today.count}</Text>
+              <Text style={styles.todayStatLabel}>
+                {today.count === 1 ? 'check-in' : 'check-ins'}
+              </Text>
+            </View>
+          </View>
+        ) : null}
 
         <MoodPicker value={score} onChange={setScore} />
 
         <TextInput
           style={styles.note}
           placeholder="Add a short note (optional)"
-          placeholderTextColor={colors.inkFaint}
+          placeholderTextColor={palette.inkFaint}
           value={note}
           onChangeText={setNote}
           multiline
@@ -72,49 +106,81 @@ export default function Log() {
         />
 
         <PrimaryButton
-          label={savedAt ? 'Saved' : 'Save check-in'}
+          label="Save check-in"
           onPress={handleSave}
           disabled={score === null}
           loading={saving}
+          accentColor={palette.accents.checkIn}
         />
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
-const styles = StyleSheet.create({
-  flex: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flexGrow: 1,
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xxl,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-  },
-  prompt: {
-    fontSize: 22,
-    fontWeight: '600',
-    color: colors.ink,
-    marginBottom: spacing.xl,
-  },
-  note: {
-    marginTop: spacing.xl,
-    backgroundColor: colors.surface,
-    borderRadius: radii.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
-    minHeight: 64,
-    fontSize: 15,
-    color: colors.ink,
-    textAlignVertical: 'top',
-    marginBottom: spacing.xl,
-  },
-});
+function createStyles(colors: Palette) {
+  return StyleSheet.create({
+    flex: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flexGrow: 1,
+      paddingHorizontal: spacing.xl,
+      paddingBottom: spacing.xxl,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.xl,
+    },
+    date: {
+      fontSize: 13,
+      color: colors.inkMuted,
+    },
+    prompt: {
+      fontSize: 22,
+      fontWeight: '600',
+      color: colors.ink,
+      marginBottom: spacing.lg,
+    },
+    todayStats: {
+      flexDirection: 'row',
+      gap: spacing.xl,
+      backgroundColor: colors.surface,
+      borderRadius: radii.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      marginBottom: spacing.xl,
+      alignSelf: 'flex-start',
+    },
+    todayStatBlock: {
+      alignItems: 'flex-start',
+    },
+    todayStatValue: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.ink,
+    },
+    todayStatLabel: {
+      fontSize: 11,
+      color: colors.inkMuted,
+      marginTop: 1,
+    },
+    note: {
+      marginTop: spacing.xl,
+      backgroundColor: colors.surface,
+      borderRadius: radii.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.md,
+      minHeight: 64,
+      fontSize: 15,
+      color: colors.ink,
+      textAlignVertical: 'top',
+      marginBottom: spacing.xl,
+    },
+  });
+}

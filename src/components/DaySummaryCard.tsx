@@ -1,6 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors } from '../theme/colors';
-import { radii, spacing } from '../theme';
+import { useTheme, radii, spacing, type Palette } from '../theme';
 import { scoreColor } from '../theme/score';
 import { formatDayLabel } from '../utils/date';
 import type { DaySummary } from '../types';
@@ -11,13 +10,16 @@ interface DaySummaryCardProps {
 }
 
 export function DaySummaryCard({ day, onPress }: DaySummaryCardProps) {
+  const { palette } = useTheme();
+  const styles = createStyles(palette);
+
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
       accessibilityRole="button"
     >
-      <View style={[styles.dot, { backgroundColor: scoreColor(day.average) }]} />
+      <View style={[styles.dot, { backgroundColor: scoreColor(day.average, palette) }]} />
       <View style={styles.info}>
         <Text style={styles.dayLabel}>{formatDayLabel(day.dateKey)}</Text>
         <Text style={styles.entryCount}>
@@ -38,53 +40,55 @@ export function DaySummaryCard({ day, onPress }: DaySummaryCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: radii.lg,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  pressed: {
-    opacity: 0.85,
-  },
-  dot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: spacing.md,
-  },
-  info: {
-    flex: 1,
-  },
-  dayLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.ink,
-  },
-  entryCount: {
-    fontSize: 13,
-    color: colors.inkMuted,
-    marginTop: 2,
-  },
-  stats: {
-    flexDirection: 'row',
-    gap: spacing.lg,
-  },
-  statBlock: {
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.ink,
-  },
-  statLabel: {
-    fontSize: 11,
-    color: colors.inkMuted,
-    marginTop: 1,
-  },
-});
+function createStyles(colors: Palette) {
+  return StyleSheet.create({
+    card: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: radii.lg,
+      padding: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    pressed: {
+      opacity: 0.85,
+    },
+    dot: {
+      width: 12,
+      height: 12,
+      borderRadius: 6,
+      marginRight: spacing.md,
+    },
+    info: {
+      flex: 1,
+    },
+    dayLabel: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.ink,
+    },
+    entryCount: {
+      fontSize: 13,
+      color: colors.inkMuted,
+      marginTop: 2,
+    },
+    stats: {
+      flexDirection: 'row',
+      gap: spacing.lg,
+    },
+    statBlock: {
+      alignItems: 'center',
+    },
+    statValue: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.ink,
+    },
+    statLabel: {
+      fontSize: 11,
+      color: colors.inkMuted,
+      marginTop: 1,
+    },
+  });
+}

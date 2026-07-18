@@ -1,4 +1,4 @@
-import { colors } from './colors';
+import type { Palette } from './palettes';
 
 function hexToRgb(hex: string) {
   const value = parseInt(hex.slice(1), 16);
@@ -18,12 +18,14 @@ function mix(hexA: string, hexB: string, t: number): string {
   return `rgb(${r}, ${g}, ${bl})`;
 }
 
-// Soft, abstract gradient across the 1-10 range. No emoji, no traffic-light coding.
-export function scoreColor(score: number): string {
+// Soft, abstract gradient across the 1-10 range. No emoji, no traffic-light
+// coding. Takes the active palette's gradient stops so it follows theme
+// changes.
+export function scoreColor(score: number, palette: Pick<Palette, 'scoreLow' | 'scoreMid' | 'scoreHigh'>): string {
   const clamped = Math.min(10, Math.max(1, score));
   const t = (clamped - 1) / 9;
   if (t <= 0.5) {
-    return mix(colors.scoreLow, colors.scoreMid, t / 0.5);
+    return mix(palette.scoreLow, palette.scoreMid, t / 0.5);
   }
-  return mix(colors.scoreMid, colors.scoreHigh, (t - 0.5) / 0.5);
+  return mix(palette.scoreMid, palette.scoreHigh, (t - 0.5) / 0.5);
 }

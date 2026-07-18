@@ -62,3 +62,18 @@ export function formatTime(date: Date): string {
     minute: '2-digit',
   });
 }
+
+function ordinalSuffix(day: number): string {
+  if (day % 10 === 1 && day !== 11) return 'st';
+  if (day % 10 === 2 && day !== 12) return 'nd';
+  if (day % 10 === 3 && day !== 13) return 'rd';
+  return 'th';
+}
+
+// "Saturday, July 18th" — Intl has no ordinal-day format, so build it by hand.
+export function formatHeaderDate(date: Date): string {
+  const weekday = date.toLocaleDateString(undefined, { weekday: 'long' });
+  const month = date.toLocaleDateString(undefined, { month: 'long' });
+  const day = date.getDate();
+  return `${weekday}, ${month} ${day}${ordinalSuffix(day)}`;
+}

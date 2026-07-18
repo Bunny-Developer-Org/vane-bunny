@@ -1,5 +1,3 @@
-import { colors } from './colors';
-
 export const spacing = {
   xs: 4,
   sm: 8,
@@ -24,6 +22,6 @@ export const typography = {
   caption: { fontSize: 12, fontWeight: '400' as const },
 };
 
-export const theme = { colors, spacing, radii, typography };
-export { colors };
-export type Theme = typeof theme;
+export { useTheme, ThemeProvider } from './ThemeContext';
+export { palettes, defaultPalette } from './palettes';
+export type { Palette } from './palettes';

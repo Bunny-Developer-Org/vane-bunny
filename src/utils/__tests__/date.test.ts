@@ -1,4 +1,4 @@
-import { formatDayLabel, formatTime, groupEntriesByDay, toDateKey } from '../date';
+import { formatDayLabel, formatHeaderDate, formatTime, groupEntriesByDay, toDateKey } from '../date';
 import type { MoodEntry } from '../../types';
 
 function entry(id: string, score: number, timestamp: Date, note?: string): MoodEntry {
@@ -98,5 +98,30 @@ describe('formatTime', () => {
     const label = formatTime(new Date(2026, 0, 1, 14, 5));
     expect(typeof label).toBe('string');
     expect(label.length).toBeGreaterThan(0);
+  });
+});
+
+describe('formatHeaderDate', () => {
+  it('formats as "Weekday, Month Dth"', () => {
+    expect(formatHeaderDate(new Date(2026, 6, 18))).toBe('Saturday, July 18th');
+  });
+
+  it('uses "st" for 1st/21st/31st', () => {
+    expect(formatHeaderDate(new Date(2026, 6, 1))).toBe('Wednesday, July 1st');
+    expect(formatHeaderDate(new Date(2026, 6, 21))).toBe('Tuesday, July 21st');
+  });
+
+  it('uses "nd" for 2nd/22nd', () => {
+    expect(formatHeaderDate(new Date(2026, 6, 2))).toBe('Thursday, July 2nd');
+  });
+
+  it('uses "rd" for 3rd/23rd', () => {
+    expect(formatHeaderDate(new Date(2026, 6, 3))).toBe('Friday, July 3rd');
+  });
+
+  it('uses "th" for the 11th-13th teens exception', () => {
+    expect(formatHeaderDate(new Date(2026, 6, 11))).toBe('Saturday, July 11th');
+    expect(formatHeaderDate(new Date(2026, 6, 12))).toBe('Sunday, July 12th');
+    expect(formatHeaderDate(new Date(2026, 6, 13))).toBe('Monday, July 13th');
   });
 });

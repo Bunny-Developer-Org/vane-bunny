@@ -1,6 +1,5 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from 'react-native';
-import { colors } from '../theme/colors';
-import { radii, spacing } from '../theme';
+import { useTheme, radii, spacing, type Palette } from '../theme';
 
 interface PrimaryButtonProps {
   label: string;
@@ -8,6 +7,8 @@ interface PrimaryButtonProps {
   disabled?: boolean;
   loading?: boolean;
   variant?: 'solid' | 'ghost';
+  /** Overrides the solid variant's fill color — lets each screen use its own tab accent. */
+  accentColor?: string;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -17,23 +18,28 @@ export function PrimaryButton({
   disabled,
   loading,
   variant = 'solid',
+  accentColor,
   style,
 }: PrimaryButtonProps) {
+  const { palette } = useTheme();
+  const styles = createStyles(palette);
   const isGhost = variant === 'ghost';
+  const fill = accentColor ?? palette.sage;
+
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled || loading}
       style={({ pressed }) => [
         styles.base,
-        isGhost ? styles.ghost : styles.solid,
+        isGhost ? styles.ghost : { backgroundColor: fill },
         (disabled || loading) && styles.disabled,
         pressed && !disabled && styles.pressed,
         style,
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={isGhost ? colors.sageDark : colors.white} />
+        <ActivityIndicator color={isGhost ? palette.sageDark : palette.white} />
       ) : (
         <Text style={[styles.label, isGhost ? styles.ghostLabel : styles.solidLabel]}>{label}</Text>
       )}
@@ -41,36 +47,35 @@ export function PrimaryButton({
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    borderRadius: radii.pill,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.xl,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  solid: {
-    backgroundColor: colors.sage,
-  },
-  ghost: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-  pressed: {
-    opacity: 0.85,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  solidLabel: {
-    color: colors.white,
-  },
-  ghostLabel: {
-    color: colors.ink,
-  },
-});
+function createStyles(colors: Palette) {
+  return StyleSheet.create({
+    base: {
+      borderRadius: radii.pill,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.xl,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    ghost: {
+      backgroundColor: 'transparent',
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    disabled: {
+      opacity: 0.5,
+    },
+    pressed: {
+      opacity: 0.85,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    solidLabel: {
+      color: colors.white,
+    },
+    ghostLabel: {
+      color: colors.ink,
+    },
+  });
+}
