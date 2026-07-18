@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { View } from 'react-native';
-import { colors } from '../../../src/theme/colors';
+import { colors } from '../../src/theme/colors';
 
 function TabDot({ focused }: { focused: boolean }) {
   return (
@@ -30,7 +30,7 @@ export default function TabsLayout() {
         tabBarIcon: ({ focused }) => <TabDot focused={focused} />,
       }}
     >
-      <Tabs.Screen name="log" options={{ title: 'Check in' }} />
+      <Tabs.Screen name="index" options={{ title: 'Check in' }} />
       <Tabs.Screen name="history" options={{ title: 'History' }} />
     </Tabs>
   );

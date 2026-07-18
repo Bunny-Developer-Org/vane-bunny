@@ -1,11 +1,11 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { EntryListItem } from '../../../src/components/EntryListItem';
-import { useMoodEntries } from '../../../src/hooks/useMoodEntries';
-import { colors } from '../../../src/theme/colors';
-import { spacing } from '../../../src/theme';
-import { formatDayLabel } from '../../../src/utils/date';
+import { EntryListItem } from '../../src/components/EntryListItem';
+import { useMoodEntries } from '../../src/hooks/useMoodEntries';
+import { colors } from '../../src/theme/colors';
+import { spacing } from '../../src/theme';
+import { formatDayLabel } from '../../src/utils/date';
 
 export default function DayDetail() {
   const { date } = useLocalSearchParams<{ date: string }>();

@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { DaySummaryCard } from '../../../src/components/DaySummaryCard';
-import { useMoodEntries } from '../../../src/hooks/useMoodEntries';
-import { colors } from '../../../src/theme/colors';
-import { spacing } from '../../../src/theme';
-import type { DaySummary } from '../../../src/types';
+import { DaySummaryCard } from '../../src/components/DaySummaryCard';
+import { useMoodEntries } from '../../src/hooks/useMoodEntries';
+import { colors } from '../../src/theme/colors';
+import { spacing } from '../../src/theme';
+import type { DaySummary } from '../../src/types';
 
 export default function History() {
   const insets = useSafeAreaInsets();

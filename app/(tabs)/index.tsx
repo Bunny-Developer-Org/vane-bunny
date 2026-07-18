@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,16 +9,14 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Logo } from '../../../src/components/Logo';
-import { MoodPicker } from '../../../src/components/MoodPicker';
-import { PrimaryButton } from '../../../src/components/PrimaryButton';
-import { useAuth } from '../../../src/context/AuthContext';
-import { addMoodEntry } from '../../../src/firebase/moodEntries';
-import { colors } from '../../../src/theme/colors';
-import { radii, spacing } from '../../../src/theme';
+import { Logo } from '../../src/components/Logo';
+import { MoodPicker } from '../../src/components/MoodPicker';
+import { PrimaryButton } from '../../src/components/PrimaryButton';
+import { addMoodEntry } from '../../src/storage/moodStore';
+import { colors } from '../../src/theme/colors';
+import { radii, spacing } from '../../src/theme';
 
 export default function Log() {
-  const { user, signOutUser } = useAuth();
   const insets = useSafeAreaInsets();
   const [score, setScore] = useState<number | null>(null);
   const [note, setNote] = useState('');
@@ -27,10 +24,10 @@ export default function Log() {
   const [savedAt, setSavedAt] = useState<number | null>(null);
 
   async function handleSave() {
-    if (!user || score === null) return;
+    if (score === null) return;
     setSaving(true);
     try {
-      await addMoodEntry(user.uid, score, note);
+      await addMoodEntry(score, note);
       setScore(null);
       setNote('');
       setSavedAt(Date.now());
@@ -53,9 +50,6 @@ export default function Log() {
       >
         <View style={styles.header}>
           <Logo size={18} />
-          <Pressable onPress={signOutUser} hitSlop={8}>
-            <Text style={styles.signOut}>Sign out</Text>
-          </Pressable>
         </View>
 
         <Text style={styles.prompt}>How are you, right now?</Text>
@@ -98,10 +92,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.xl,
-  },
-  signOut: {
-    fontSize: 13,
-    color: colors.inkMuted,
   },
   prompt: {
     fontSize: 22,
