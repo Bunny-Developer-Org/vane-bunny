@@ -40,7 +40,7 @@ export default function Privacy() {
       <View style={styles.summary}>
         <Text style={styles.summaryText}>
           <Text style={styles.summaryStrong}>The short version: </Text>
-          Vane Bunny collects nothing. There's no account, no analytics, no crash reporting, and
+          Vane Bunny collects nothing. There&apos;s no account, no analytics, no crash reporting, and
           no network access at all. Everything you enter stays only on your device.
         </Text>
       </View>
@@ -52,8 +52,8 @@ export default function Privacy() {
       </Section>
 
       <Section title="What the app stores, and where" styles={styles}>
-        When you log a mood check-in (a score from 1–10 and an optional short note), it's saved
-        using your device's local on-device storage only. It never leaves your device — not to a
+        When you log a mood check-in (a score from 1–10 and an optional short note), it&apos;s saved
+        using your device&apos;s local on-device storage only. It never leaves your device — not to a
         server, not to us, not to anyone.
       </Section>
 
@@ -63,7 +63,7 @@ export default function Privacy() {
       </Section>
 
       <Section title="Third parties" styles={styles}>
-        None are involved. Vane Bunny doesn't share data with anyone because it doesn't collect or
+        None are involved. Vane Bunny doesn&apos;t share data with anyone because it doesn&apos;t collect or
         transmit any data in the first place.
       </Section>
 
@@ -73,9 +73,9 @@ export default function Privacy() {
       </Section>
 
       <Section title="Changes to this policy" styles={styles}>
-        If Vane Bunny's data practices ever change (for example, if a future version adds optional
+        If Vane Bunny&apos;s data practices ever change (for example, if a future version adds optional
         cloud sync), this page will be updated first, and the change will be reflected in the
-        app's description in whichever app store it's distributed through.
+        app&apos;s description in whichever app store it&apos;s distributed through.
       </Section>
     </ScrollView>
   );

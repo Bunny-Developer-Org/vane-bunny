@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Animated, StyleSheet, Text } from 'react-native';
 import { radii, spacing } from '../theme';
 
@@ -9,7 +9,7 @@ interface ToastProps {
 }
 
 export function Toast({ message, accentColor, bottom }: ToastProps) {
-  const opacity = useRef(new Animated.Value(0)).current;
+  const [opacity] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     Animated.timing(opacity, {
