@@ -9,17 +9,17 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Banner } from '../../src/components/Banner';
 import { Logo } from '../../src/components/Logo';
 import { MoodPicker } from '../../src/components/MoodPicker';
 import { PrimaryButton } from '../../src/components/PrimaryButton';
+import { Toast } from '../../src/components/Toast';
 import { useMoodEntries } from '../../src/hooks/useMoodEntries';
 import { addMoodEntry } from '../../src/storage/moodStore';
 import { useTheme, radii, spacing, type Palette } from '../../src/theme';
 import { formatHeaderDate, toDateKey } from '../../src/utils/date';
 import { getThankYouMessage } from '../../src/utils/encouragement';
 
-const BANNER_DURATION_MS = 3500;
+const TOAST_DURATION_MS = 3500;
 
 export default function Log() {
   const insets = useSafeAreaInsets();
@@ -31,7 +31,7 @@ export default function Log() {
   const [saving, setSaving] = useState(false);
   const [thankYou, setThankYou] = useState<string | null>(null);
   const savingRef = useRef(false);
-  const bannerTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const today = days.find((day) => day.dateKey === toDateKey(new Date()));
 
@@ -46,8 +46,8 @@ export default function Log() {
       setThankYou(getThankYouMessage(score));
       setScore(null);
       setNote('');
-      if (bannerTimeoutRef.current) clearTimeout(bannerTimeoutRef.current);
-      bannerTimeoutRef.current = setTimeout(() => setThankYou(null), BANNER_DURATION_MS);
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+      toastTimeoutRef.current = setTimeout(() => setThankYou(null), TOAST_DURATION_MS);
     } catch (err) {
       console.error('Failed to save entry', err);
     } finally {
@@ -71,8 +71,6 @@ export default function Log() {
         </View>
 
         <Text style={styles.prompt}>How are you, right now?</Text>
-
-        {thankYou ? <Banner message={thankYou} accentColor={palette.accents.checkIn} /> : null}
 
         {today ? (
           <View style={styles.todayStats}>
@@ -113,6 +111,14 @@ export default function Log() {
           accentColor={palette.accents.checkIn}
         />
       </ScrollView>
+
+      {thankYou ? (
+        <Toast
+          message={thankYou}
+          accentColor={palette.accents.checkIn}
+          bottom={insets.bottom + spacing.lg}
+        />
+      ) : null}
     </KeyboardAvoidingView>
   );
 }
