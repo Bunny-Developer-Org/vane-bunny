@@ -12,7 +12,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.vanebunny.app",
+      "package": "com.bunnydeveloper.vanebunny",
       "adaptiveIcon": {
         "backgroundColor": "#F7F2E9",
         "foregroundImage": "./assets/android-icon-foreground.png",

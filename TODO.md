@@ -65,7 +65,7 @@ leaves the device:
       short/full description in `listing.md`, `icon-512.png`,
       `feature-graphic-1024x500.png`, and 4 real phone screenshots in
       `screenshots/` (generated from the actual running app, not mockups)
-- [ ] Create the app in Play Console, set package name `com.vanebunny.app`
+- [x] Create the app in Play Console, set package name `com.bunnydeveloper.vanebunny`
 - [ ] Paste in the store listing text and upload the graphics from
       `store-assets/`
 - [ ] Set pricing (free) and country availability
