@@ -24,13 +24,19 @@ leaves the device:
 
 - [x] `docs/privacy-policy.html` written — self-contained static page stating
       the no-collection stance
-- [ ] **Fill in the placeholder contact email** in
+- [x] **Fill in the placeholder contact email** in
       `docs/privacy-policy.html` (search for `REPLACE_WITH_CONTACT_EMAIL`)
       before publishing it anywhere
-- [ ] Host it somewhere with a stable URL for the Play Console listing —
-      easiest is enabling GitHub Pages on this repo (Settings → Pages →
-      deploy from branch → `/docs` folder), which would serve it at
-      `https://<you>.github.io/vane-bunny/privacy-policy.html`
+- [x] Host it somewhere with a stable URL for the Play Console listing —
+      GitHub Pages is enabled and serves it at
+      `https://bunny-developer-org.github.io/vane-bunny/privacy-policy.html`
+- [x] Minimize Android permissions — `app.json`'s `android.blockedPermissions`
+      strips the unused `SYSTEM_ALERT_WINDOW` / `VIBRATE` /
+      `READ_EXTERNAL_STORAGE` / `WRITE_EXTERNAL_STORAGE` permissions that
+      Expo's template requests by default; the remaining `INTERNET`
+      permission (required by React Native's dev tooling, unused at runtime)
+      is explained in the "Android permissions" section of
+      `docs/privacy-policy.html`
 - [ ] Fill out Play Console's **Data safety** section as **"No data
       collected"** — accurate here since there's no account, no analytics,
       no crash reporting, no network calls at all
