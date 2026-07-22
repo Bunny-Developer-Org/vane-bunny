@@ -64,6 +64,15 @@ leaves the device:
 - [ ] For `eas submit`, generate a Google Play service account JSON key
       (Play Console → Setup → API access) and save it as
       `google-service-account.json` in the project root (already gitignored)
+- [x] Automate build + submit via GitHub Actions — see the "Continuous
+      deployment" section in README.md
+      (`.github/workflows/eas-build-submit.yml`, triggered by pushing a
+      `v*.*.*` tag or manually)
+- [ ] Set the `EXPO_TOKEN` and `GOOGLE_SERVICE_ACCOUNT_JSON` repository
+      secrets in GitHub so the above workflow can actually run
+- [ ] Optional follow-up: wire EAS build/submit completion back into
+      something visible (Slack, GitHub status check, etc.) — not set up yet,
+      see README's Continuous deployment section
 
 ## 4. Play Console listing
 

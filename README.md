@@ -75,6 +75,22 @@ npm run submit:android   # uploads the latest production build to Play Console
 
 `eas submit` needs a Google Play service account key saved as `google-service-account.json` in the project root (gitignored). See `TODO.md` for the full Play Store deployment checklist.
 
+### Continuous deployment (GitHub Actions)
+
+[`.github/workflows/eas-build-submit.yml`](.github/workflows/eas-build-submit.yml) automates the `build:production` + `submit:android` steps above. It triggers on:
+
+- pushing a version tag matching `v*.*.*` (e.g. `git push origin v1.0.2`)
+- manually, via the "Run workflow" button on the Actions tab (`workflow_dispatch`)
+
+The job runs `eas build --platform android --profile production --auto-submit --no-wait`. The `--no-wait` flag is deliberate: the actual build compile and Play Store upload happen entirely on Expo's (EAS's) infrastructure, not the GitHub runner, so the CI job just queues both and exits in under a minute instead of blocking (and burning GitHub Actions minutes) for the ~15-20 minutes a full build + submit takes.
+
+Trade-off: because of `--no-wait`, the GitHub Actions run only confirms that the build and submission were successfully *queued* — not that they actually succeeded. Check [expo.dev](https://expo.dev) (the project's Builds/Submissions dashboard) for real status. There's no feedback loop back into GitHub yet (e.g. a Slack ping or a status check once the build/submit finishes) — that's a possible future improvement, not currently wired up.
+
+Two repository secrets must be set under Settings → Secrets and variables → Actions before the workflow can run:
+
+- **`EXPO_TOKEN`** — an Expo access token (expo.dev → account/org settings → Access Tokens) scoped to the `bunny-developer` org
+- **`GOOGLE_SERVICE_ACCOUNT_JSON`** — the full contents of the local `google-service-account.json` used for `eas submit`
+
 ## Design direction
 
 Muted, rounded, calm — the app deliberately avoids mood/emotion iconography (no emoji faces, no literal "tracker" branding). The 1–10 selector uses an abstract low-to-high color gradient instead.
