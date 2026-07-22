@@ -2,7 +2,7 @@
   "expo": {
     "name": "Vane Bunny",
     "slug": "vane-bunny",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "scheme": "vanebunny",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -19,7 +19,13 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "blockedPermissions": [
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.VIBRATE",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -46,6 +52,6 @@
         "projectId": "74d8b097-e4f3-46c1-b8de-3f2190fbb60e"
       }
     },
-    "owner": "pgradziels-team"
+    "owner": "bunny-developer"
   }
 }
