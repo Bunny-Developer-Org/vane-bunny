@@ -42,9 +42,11 @@ follows [Keep a Changelog](https://keepachangelog.com/).
 ## 2026-07-22
 
 - Minimized Android permissions requested by the app —
-  `android.blockedPermissions` in `app.json` now strips
-  `SYSTEM_ALERT_WINDOW`, `VIBRATE`, `READ_EXTERNAL_STORAGE`, and
-  `WRITE_EXTERNAL_STORAGE` from Expo's default template.
+  `android.blockedPermissions` strips `SYSTEM_ALERT_WINDOW`, `VIBRATE`,
+  `READ_EXTERNAL_STORAGE`, and `WRITE_EXTERNAL_STORAGE` from Expo's
+  default template; production and preview builds also strip
+  `INTERNET` ("full network access") via `app.config.js`, since the
+  shipped app is fully offline.
 - Updated the Android package name to include the Bunny Developer org
   (`com.bunnydeveloper.vanebunny`).
 

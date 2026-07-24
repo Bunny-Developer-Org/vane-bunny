@@ -30,13 +30,13 @@ leaves the device:
 - [x] Host it somewhere with a stable URL for the Play Console listing —
       GitHub Pages is enabled and serves it at
       `https://bunny-developer-org.github.io/vane-bunny/privacy-policy.html`
-- [x] Minimize Android permissions — `app.json`'s `android.blockedPermissions`
-      strips the unused `SYSTEM_ALERT_WINDOW` / `VIBRATE` /
-      `READ_EXTERNAL_STORAGE` / `WRITE_EXTERNAL_STORAGE` permissions that
-      Expo's template requests by default; the remaining `INTERNET`
-      permission (required by React Native's dev tooling, unused at runtime)
-      is explained in the "Android permissions" section of
-      `docs/privacy-policy.html`
+- [x] Minimize Android permissions — `android.blockedPermissions` strips
+      `SYSTEM_ALERT_WINDOW` / `VIBRATE` / `READ_EXTERNAL_STORAGE` /
+      `WRITE_EXTERNAL_STORAGE`; production/preview builds also strip
+      `INTERNET` (kept only for the development client so Metro works).
+      Documented in the "Android permissions" section of
+      `docs/privacy-policy.html`. Rebuild + resubmit the Play Store AAB
+      so the listing reflects the trimmed set.
 - [ ] Fill out Play Console's **Data safety** section as **"No data
       collected"** — accurate here since there's no account, no analytics,
       no crash reporting, no network calls at all
