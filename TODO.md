@@ -54,22 +54,33 @@ leaves the device:
 - [x] `cli.appVersionSource: "remote"` + `autoIncrement: true` on the
       production profile — EAS manages `versionCode` for you, no manual
       bumps needed in `app.json`
-- [ ] **Requires your Expo account** — `npx eas login`, then `npx eas init`
+- [x] **Requires your Expo account** — `npx eas login`, then `npx eas init`
       to create the EAS project and write `extra.eas.projectId` into
-      `app.json` (can't be done without your credentials)
-- [ ] Run `npm run build:production` (or `build:preview` first for a quick
-      installable APK to sanity-check on a device before a store build)
+      `app.json`. Already done — `app.json`'s `extra.eas.projectId` is set,
+      and a 2026-07-24 CI run confirmed `eas whoami` authenticates as the
+      `bunny-developer` account.
+- [x] Run `npm run build:production` (or `build:preview` first for a quick
+      installable APK to sanity-check on a device before a store build) —
+      queued successfully via the GitHub Actions workflow on 2026-07-24
+      (App Version 1.0.3, versionCode 5); check
+      https://expo.dev/accounts/bunny-developer/projects/vane-bunny/builds
+      for the native build to finish.
 - [ ] Enroll in **Play App Signing** when you create the app in Play Console
       (default and recommended)
-- [ ] For `eas submit`, generate a Google Play service account JSON key
+- [x] For `eas submit`, generate a Google Play service account JSON key
       (Play Console → Setup → API access) and save it as
-      `google-service-account.json` in the project root (already gitignored)
+      `google-service-account.json` in the project root (already
+      gitignored) — confirmed working via CI logs, authenticating as
+      `vane-bunny-play-publisher@vane-bunny.iam.gserviceaccount.com`.
 - [x] Automate build + submit via GitHub Actions — see the "Continuous
       deployment" section in README.md
       (`.github/workflows/eas-build-submit.yml`, triggered by pushing a
       `v*.*.*` tag or manually)
-- [ ] Set the `EXPO_TOKEN` and `GOOGLE_SERVICE_ACCOUNT_JSON` repository
-      secrets in GitHub so the above workflow can actually run
+- [x] Set the `EXPO_TOKEN` and `GOOGLE_SERVICE_ACCOUNT_JSON` repository
+      secrets in GitHub so the above workflow can actually run — verified
+      via a manual `workflow_dispatch` run on 2026-07-24: `eas whoami`
+      authenticated with `EXPO_TOKEN`, and the submission was scheduled to
+      the internal Play Store track using `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - [ ] Optional follow-up: wire EAS build/submit completion back into
       something visible (Slack, GitHub status check, etc.) — not set up yet,
       see README's Continuous deployment section
@@ -86,7 +97,10 @@ leaves the device:
 - [ ] Set pricing (free) and country availability
 - [ ] Upload the `.aab` from §3 to an **internal testing** track first,
       verify on a real signed build, then promote internal → closed/open
-      testing → production
+      testing → production — a v1.0.3 build was queued and its submission
+      scheduled to the internal track via CI on 2026-07-24; still needs
+      confirming in Play Console that it finished processing, then
+      verifying on a real device
 
 ## 5. Post-launch (not required for v1 launch, just flagged for later)
 
