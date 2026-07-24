@@ -39,14 +39,20 @@ follows [Keep a Changelog](https://keepachangelog.com/).
   title/description text split out from `listing.md`.
 - This changelog.
 
+## 2026-07-24
+
+- Stripped `INTERNET` ("full network access") from production and
+  preview Android builds too — `app.config.js` now removes it
+  dynamically based on the EAS build profile, keeping it only for the
+  development client build where Metro needs it to serve the JS bundle.
+  Store builds now request zero Android permissions.
+
 ## 2026-07-22
 
 - Minimized Android permissions requested by the app —
-  `android.blockedPermissions` strips `SYSTEM_ALERT_WINDOW`, `VIBRATE`,
-  `READ_EXTERNAL_STORAGE`, and `WRITE_EXTERNAL_STORAGE` from Expo's
-  default template; production and preview builds also strip
-  `INTERNET` ("full network access") via `app.config.js`, since the
-  shipped app is fully offline.
+  `android.blockedPermissions` in `app.json` now strips
+  `SYSTEM_ALERT_WINDOW`, `VIBRATE`, `READ_EXTERNAL_STORAGE`, and
+  `WRITE_EXTERNAL_STORAGE` from Expo's default template.
 - Updated the Android package name to include the Bunny Developer org
   (`com.bunnydeveloper.vanebunny`).
 
