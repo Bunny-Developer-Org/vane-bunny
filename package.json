@@ -36,19 +36,28 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
+    "help": "node scripts/help.js",
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "web:watch": "expo start --web",
     "test": "jest",
+    "test:silent": "jest --silent",
     "build:dev": "eas build --platform android --profile development",
     "build:preview": "eas build --platform android --profile preview",
     "build:production": "eas build --platform android --profile production",
     "submit:android": "eas submit --platform android --profile production",
     "lint": "expo lint",
+    "type-check": "tsc --noEmit",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "quality:check": "quality-check.bat",
+    "quality:no-bail": "quality-check.bat --no-bail",
+    "quality:json": "quality-check.bat --no-bail --json-output",
+    "deps:audit": "dependency-cruiser --config .dependency-cruiser.cjs --output-type err-long src app",
+    "fallow:dead-code": "fallow dead-code --fail-on-issues",
+    "fallow:dupes": "fallow dupes --fail-on-issues"
   },
   "private": true
 }
