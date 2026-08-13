@@ -6,15 +6,29 @@ follows [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Fixed
+- Realigned every native dependency to its Expo SDK 57 pin, which
+  `expo-doctor` was flagging and which made the app unrunnable in Expo Go
+  (it crashed on launch with "Native module is null" from AsyncStorage and
+  a missing `installUIRuntimeBindings` from gesture-handler). The two
+  majors ahead of the SDK were
+  `@react-native-async-storage/async-storage` 3.1.1 → 2.2.0 and
+  `react-native-gesture-handler` 3.1.0 → 2.32.0; `react-native`,
+  `expo`, `expo-router`, `react-native-safe-area-context` and friends
+  moved to their pinned patch/minor. **No stored data is affected by the
+  async-storage downgrade:** that package's v3 default export is
+  `getLegacyStorage()`, the v2-backed implementation, so the app has been
+  reading and writing the v2 store all along. Native version ranges are
+  now `~`/exact rather than `^`, which is what let them drift in the
+  first place.
 - The check-in screen's "Save check-in" button is now pinned to the bottom
   of the screen instead of sitting at the end of the scroll content, so it
   stays visible while the note field is focused — previously the software
   keyboard covered it and you had to dismiss the keyboard or scroll to
   reach it. The bottom tab bar now hides while the keyboard is up
   (`tabBarHideOnKeyboard`) so it doesn't sit between the keyboard and that
-  button, and the check-in screen's `KeyboardAvoidingView` drops its
-  Android `behavior="height"` — Android's window already resizes for the
-  keyboard, and the extra shrink was fighting it.
+  button. The `KeyboardAvoidingView`'s existing `behavior` is unchanged —
+  Android's `"height"` is what shrinks the view to the space above the
+  keyboard and carries the pinned button up with it.
 - Recentered the three-leaf mark in `assets/icon.png`,
   `android-icon-foreground.png`, `splash-icon.png`, and `favicon.png` —
   the mark's pivot point (where the three leaves meet) was off-center by
@@ -25,6 +39,13 @@ follows [Keep a Changelog](https://keepachangelog.com/).
   real app icon.
 
 ### Removed
+- `newArchEnabled` from `app.json` — the New Architecture is unconditional
+  from Expo SDK 55 onward, so the key is no longer part of the config
+  schema and `expo-doctor` rejected it.
+- `eas-cli` as a project devDependency; Expo's tooling expects it global or
+  run through `npx`, so the `build:*`/`submit:android` scripts now call
+  `npx eas-cli`. CI is unaffected — the workflow installs its own copy via
+  `expo/expo-github-action`.
 - `assets/android-icon-monochrome.png` and the `monochromeImage` entry in
   `app.json`'s `android.adaptiveIcon` config — its artwork didn't match
   the two-color mark used everywhere else (missing the third leaf), so
@@ -32,6 +53,11 @@ follows [Keep a Changelog](https://keepachangelog.com/).
   layers without a themed-icon monochrome variant.
 
 ### Changed
+- `app.config.js` now takes Expo's `({ config })` argument — the values
+  from `app.json`, which Expo reads first — instead of `require`-ing
+  `app.json` itself and returning a freshly built object. Same resolved
+  config either way, but the static and dynamic halves are now visibly
+  connected, which is what `expo-doctor` checks for.
 - Redesigned `store-assets/feature-graphic-1024x500.png` — it previously
   used an unrelated circles motif instead of the app's actual leaf mark
   and brand colors; it now uses the corrected mark plus real copy.

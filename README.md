@@ -47,9 +47,12 @@ Requires Node 20.19.4+, 22.13.0+, or 24.3.0+ (whatever React Native 0.86 support
 ```
 nvm use             # optional, matches .nvmrc
 npm install
-npm run web        # http://localhost:8081
-npm run android     # requires an emulator or device + Expo dev client / Expo Go
+npm start           # Metro + QR code; scan it with Expo Go
+npm run web         # http://localhost:8081
+npm run android     # local native build onto an emulator/device (needs the Android SDK)
 ```
+
+`npm start` with Expo Go is the quick path for JS-only changes. It only works while every native dependency matches the versions Expo Go bundles for the SDK — run `npx expo-doctor` if the app crashes on launch with "Native module is null" or a missing-native-function error, since that means a native package has drifted off its SDK 57 pin. Install native packages with `npx expo install <pkg>`, never plain `npm install <pkg>`, to keep them pinned.
 
 No environment variables, no setup steps beyond `npm install` — there's nothing external to configure.
 
@@ -63,11 +66,11 @@ Unit tests cover the pure logic in `src/utils/stats.ts` and `src/utils/date.ts` 
 
 ## Building for Android (EAS)
 
-Build profiles live in `eas.json` (`development`, `preview`, `production`) and `eas-cli` is a dev dependency, so:
+Build profiles live in `eas.json` (`development`, `preview`, `production`). `eas-cli` is deliberately _not_ a project dependency — Expo's tooling expects it installed globally or invoked via `npx` (the `build:*` npm scripts below do the latter), so:
 
 ```
-npx eas login          # your Expo account
-npx eas init            # one-time: creates the EAS project, writes projectId into app.json
+npx eas-cli login       # your Expo account
+npx eas-cli init        # one-time: creates the EAS project, writes projectId into app.json
 npm run build:preview    # installable .apk for testing on a device
 npm run build:production # .aab for the Play Store, versionCode auto-incremented by EAS
 npm run submit:android   # uploads the latest production build to Play Console

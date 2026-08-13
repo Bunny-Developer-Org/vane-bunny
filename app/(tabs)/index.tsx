@@ -59,16 +59,19 @@ export default function Log() {
   }
 
   // The save button lives outside the ScrollView (see styles.footer) so it stays
-  // pinned to the bottom of the screen instead of scrolling out of reach behind
-  // the keyboard. On Android the window itself resizes for the keyboard
-  // (softwareKeyboardLayoutMode defaults to "resize", the only mode edge-to-edge
-  // supports), which is what lifts the footer above it — hence no `behavior`
-  // there, per Expo's keyboard-handling guide; iOS needs "padding" for the same
-  // result.
+  // pinned to the bottom of this view instead of scrolling out of reach behind
+  // the keyboard.
+  //
+  // Android keeps behavior="height" (see the edge-to-edge note in git history):
+  // mandatory edge-to-edge means the window no longer auto-resizes for the
+  // keyboard, so without it the footer would just sit underneath. "height"
+  // shrinks this view to the space above the keyboard, taking the footer with
+  // it — and it stays correct even where the window does resize, since RN then
+  // measures the keyboard overlap as zero and shrinks by nothing.
   return (
     <KeyboardAvoidingView
       style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
         contentContainerStyle={[styles.container, { paddingTop: insets.top + spacing.md }]}

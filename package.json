@@ -6,28 +6,27 @@
     "node": "^20.19.4 || ^22.13.0 || ^24.3.0 || >= 25.0.0"
   },
   "dependencies": {
-    "@expo/metro-runtime": "~57.0.4",
-    "@react-native-async-storage/async-storage": "^3.1.1",
-    "expo": "~57.0.7",
-    "expo-constants": "^57.0.6",
-    "expo-linking": "^57.0.3",
-    "expo-router": "^57.0.7",
-    "expo-splash-screen": "~57.0.4",
+    "@expo/metro-runtime": "~57.0.9",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "expo": "~57.0.12",
+    "expo-constants": "~57.0.10",
+    "expo-linking": "~57.0.5",
+    "expo-router": "~57.0.12",
+    "expo-splash-screen": "~57.0.6",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
-    "react-dom": "^19.2.3",
-    "react-native": "0.86.0",
-    "react-native-gesture-handler": "^3.1.0",
-    "react-native-safe-area-context": "^5.8.0",
-    "react-native-screens": "^4.26.2",
-    "react-native-web": "^0.21.2"
+    "react-dom": "19.2.3",
+    "react-native": "0.86.2",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.26.2",
+    "react-native-web": "~0.21.2"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/react": "~19.2.2",
-    "eas-cli": "^21.0.2",
     "eslint": "^9.0.0",
-    "eslint-config-expo": "~57.0.0",
+    "eslint-config-expo": "~57.0.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.6",
     "jest": "^30.4.2",
@@ -42,13 +41,21 @@
     "web": "expo start --web",
     "web:watch": "expo start --web",
     "test": "jest",
-    "build:dev": "eas build --platform android --profile development",
-    "build:preview": "eas build --platform android --profile preview",
-    "build:production": "eas build --platform android --profile production",
-    "submit:android": "eas submit --platform android --profile production",
+    "build:dev": "npx eas-cli build --platform android --profile development",
+    "build:preview": "npx eas-cli build --platform android --profile preview",
+    "build:production": "npx eas-cli build --platform android --profile production",
+    "submit:android": "npx eas-cli submit --platform android --profile production",
     "lint": "expo lint",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
+  },
+  "expo": {
+    "install": {
+      "exclude": [
+        "jest",
+        "@types/jest"
+      ]
+    }
   },
   "private": true
 }
