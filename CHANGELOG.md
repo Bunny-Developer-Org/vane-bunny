@@ -6,6 +6,15 @@ follows [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Fixed
+- The check-in screen's "Save check-in" button is now pinned to the bottom
+  of the screen instead of sitting at the end of the scroll content, so it
+  stays visible while the note field is focused — previously the software
+  keyboard covered it and you had to dismiss the keyboard or scroll to
+  reach it. The bottom tab bar now hides while the keyboard is up
+  (`tabBarHideOnKeyboard`) so it doesn't sit between the keyboard and that
+  button, and the check-in screen's `KeyboardAvoidingView` drops its
+  Android `behavior="height"` — Android's window already resizes for the
+  keyboard, and the extra shrink was fighting it.
 - Recentered the three-leaf mark in `assets/icon.png`,
   `android-icon-foreground.png`, `splash-icon.png`, and `favicon.png` —
   the mark's pivot point (where the three leaves meet) was off-center by

@@ -58,10 +58,17 @@ export default function Log() {
     }
   }
 
+  // The save button lives outside the ScrollView (see styles.footer) so it stays
+  // pinned to the bottom of the screen instead of scrolling out of reach behind
+  // the keyboard. On Android the window itself resizes for the keyboard
+  // (softwareKeyboardLayoutMode defaults to "resize", the only mode edge-to-edge
+  // supports), which is what lifts the footer above it — hence no `behavior`
+  // there, per Expo's keyboard-handling guide; iOS needs "padding" for the same
+  // result.
   return (
     <KeyboardAvoidingView
       style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView
         contentContainerStyle={[styles.container, { paddingTop: insets.top + spacing.md }]}
@@ -104,7 +111,9 @@ export default function Log() {
           multiline
           maxLength={200}
         />
+      </ScrollView>
 
+      <View style={styles.footer}>
         <PrimaryButton
           label={t('checkIn.save')}
           onPress={handleSave}
@@ -112,7 +121,7 @@ export default function Log() {
           loading={saving}
           accentColor={palette.accents.checkIn}
         />
-      </ScrollView>
+      </View>
 
       <Toast message={thankYou} accentColor={palette.accents.checkIn} insetBottom={insets.bottom} />
     </KeyboardAvoidingView>
@@ -128,7 +137,17 @@ function createStyles(colors: Palette) {
     container: {
       flexGrow: 1,
       paddingHorizontal: spacing.xl,
-      paddingBottom: spacing.xxl,
+      paddingBottom: spacing.lg,
+    },
+    footer: {
+      paddingHorizontal: spacing.xl,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.lg,
+      // Opaque, with a hairline rule: the scroll content passes underneath this
+      // bar, so it needs to read as a surface rather than let text bleed through.
+      backgroundColor: colors.background,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
     },
     header: {
       flexDirection: 'row',
@@ -183,7 +202,6 @@ function createStyles(colors: Palette) {
       fontSize: 15,
       color: colors.ink,
       textAlignVertical: 'top',
-      marginBottom: spacing.xl,
     },
   });
 }

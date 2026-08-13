@@ -41,6 +41,11 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        // With the Android window resizing for the keyboard, leaving the tab bar
+        // on would stack it between the keyboard and the check-in screen's
+        // pinned save button, eating the space that button needs. Nothing on the
+        // tab bar is useful mid-typing anyway.
+        tabBarHideOnKeyboard: true,
         tabBarInactiveTintColor: palette.inkFaint,
         tabBarStyle: {
           backgroundColor: palette.surface,
