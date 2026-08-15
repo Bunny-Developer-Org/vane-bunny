@@ -15,6 +15,7 @@ export function EntryListItem({ entry, onEdit, onDelete }: EntryListItemProps) {
   const { palette } = useTheme();
   const { language, t } = useI18n();
   const styles = createStyles(palette);
+  const time = formatTime(entry.timestamp, language);
 
   return (
     <View style={styles.row}>
@@ -24,7 +25,7 @@ export function EntryListItem({ entry, onEdit, onDelete }: EntryListItemProps) {
       <View style={styles.body}>
         {entry.note ? <Text style={styles.note}>{entry.note}</Text> : null}
         <Text style={styles.time}>
-          {formatTime(entry.timestamp, language)}
+          {time}
           {entry.updatedAt ? ` · ${t('dayDetail.edited')}` : ''}
         </Text>
       </View>
@@ -32,9 +33,9 @@ export function EntryListItem({ entry, onEdit, onDelete }: EntryListItemProps) {
         {onEdit ? (
           <Pressable
             onPress={onEdit}
-            hitSlop={8}
+            style={styles.actionButton}
             accessibilityRole="button"
-            accessibilityLabel={t('dayDetail.editEntryLabel')}
+            accessibilityLabel={t('dayDetail.editEntryLabel', { score: entry.score, time })}
           >
             <Text style={styles.edit}>{t('common.edit')}</Text>
           </Pressable>
@@ -42,9 +43,9 @@ export function EntryListItem({ entry, onEdit, onDelete }: EntryListItemProps) {
         {onDelete ? (
           <Pressable
             onPress={onDelete}
-            hitSlop={8}
+            style={styles.actionButton}
             accessibilityRole="button"
-            accessibilityLabel={t('dayDetail.deleteEntryLabel')}
+            accessibilityLabel={t('dayDetail.deleteEntryLabel', { score: entry.score, time })}
           >
             <Text style={styles.delete}>{t('common.delete')}</Text>
           </Pressable>
@@ -90,13 +91,19 @@ function createStyles(colors: Palette) {
       fontSize: 12,
       color: colors.inkMuted,
     },
-    // spacing.md keeps the two labels' `hitSlop={8}` touch targets from
-    // meeting in the middle, where a tap between them would hit whichever
-    // Pressable happens to win.
     actions: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.md,
+      gap: spacing.sm,
+    },
+    // The labels are 12px text, so the tappable box has to come from padding
+    // rather than `hitSlop` — hitSlop is a no-op in react-native-web, and one
+    // of these two buttons is destructive. The gap then stays a real dead
+    // zone between them instead of two hit rectangles meeting in the middle.
+    actionButton: {
+      minHeight: 44,
+      justifyContent: 'center',
+      paddingHorizontal: spacing.sm,
     },
     edit: {
       fontSize: 12,

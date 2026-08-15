@@ -269,19 +269,79 @@ describe('mutations racing hydration', () => {
     expect(store.getMoodEntries()).toHaveLength(3);
     expect(lastWrite(storage).map((e) => e.id)).toContain('older');
   });
+});
 
-  it('still runs queued mutations when hydration fails to read storage', async () => {
+describe('when stored data cannot be read', () => {
+  let consoleError: jest.SpyInstance;
+
+  beforeEach(() => {
+    consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    consoleError.mockRestore();
+  });
+
+  it('refuses to write after a failed read rather than overwriting the history', async () => {
     const { store, storage } = freshStore(SEED);
-    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const onDisk = mockStorage.value;
     storage.getItem.mockRejectedValue(new Error('bridge exploded'));
 
-    // A failed read falls back to an empty store rather than rejecting, so the
-    // write queue must not be left stuck behind it.
-    await expect(store.addMoodEntry(6, 'after failure')).resolves.toBeUndefined();
-    await expect(store.addMoodEntry(4, 'and another')).resolves.toBeUndefined();
+    // The empty `entries` left by a failed read is a fallback, not a reading of
+    // what's on disk — persisting a mutation of it would destroy the history
+    // the app just failed to read.
+    await expect(store.addMoodEntry(6, 'after failure')).rejects.toThrow(
+      'refusing to overwrite stored data',
+    );
+    // A rejection must not wedge the queue: the next mutation gets the same
+    // refusal, not a promise that never settles.
+    await expect(store.updateMoodEntry('older', 2, 'nope')).rejects.toThrow(
+      'refusing to overwrite stored data',
+    );
 
-    expect(store.getMoodEntries()).toHaveLength(2);
-    consoleError.mockRestore();
+    expect(storage.setItem).not.toHaveBeenCalled();
+    expect(mockStorage.value).toBe(onDisk);
+    expect(store.getMoodEntries()).toEqual([]);
+  });
+
+  it('treats a stored payload that is not an array as a failed read', async () => {
+    mockStorage.value = '{"oops":true}';
+    const { store, storage } = freshStore();
+
+    await expect(store.loadMoodEntries()).resolves.toBeUndefined();
+
+    expect(store.isMoodStoreLoaded()).toBe(true);
+    expect(store.getMoodEntries()).toEqual([]);
+    await expect(store.addMoodEntry(5, 'x')).rejects.toThrow('refusing to overwrite stored data');
+    expect(storage.setItem).not.toHaveBeenCalled();
+    expect(mockStorage.value).toBe('{"oops":true}');
+  });
+
+  it('drops a row with an unreadable timestamp instead of letting it block every write', async () => {
+    const { store, storage } = freshStore([
+      { id: 'good', score: 5, timestamp: '2026-01-05T08:00:00.000Z' },
+      { id: 'corrupt', score: 4, timestamp: 'not a date' },
+    ]);
+
+    await store.loadMoodEntries();
+
+    expect(store.getMoodEntries().map((e) => e.id)).toEqual(['good']);
+    // Keeping the corrupt row would throw a RangeError out of `toISOString()`
+    // on the next write and leave the store permanently unwritable.
+    await expect(store.updateMoodEntry('good', 8, 'still writable')).resolves.toBeUndefined();
+    expect(lastWrite(storage).map((e) => e.id)).toEqual(['good']);
+  });
+
+  it('keeps an entry whose updatedAt is unreadable, minus the edit stamp', async () => {
+    const { store } = freshStore([
+      { id: 'edited', score: 5, timestamp: '2026-01-05T08:00:00.000Z', updatedAt: 'nonsense' },
+    ]);
+
+    await store.loadMoodEntries();
+    const entry = store.getMoodEntries().find((e) => e.id === 'edited') as MoodEntry;
+
+    expect(entry.timestamp.toISOString()).toBe('2026-01-05T08:00:00.000Z');
+    expect(entry.updatedAt).toBeUndefined();
   });
 });
 
@@ -300,5 +360,42 @@ describe('subscribeToMoodStore', () => {
     unsubscribe();
     await store.deleteMoodEntry('newer');
     expect(seenAtNotify).toEqual([3]);
+  });
+
+  it('does not report a committed mutation as failed when a subscriber throws', async () => {
+    const { store, storage } = freshStore(SEED);
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+    await store.loadMoodEntries();
+    const alsoNotified = jest.fn();
+    store.subscribeToMoodStore(() => {
+      throw new Error('listener blew up');
+    });
+    store.subscribeToMoodStore(alsoNotified);
+
+    // The write already reached disk by the time listeners run, so surfacing a
+    // listener's failure to the caller would claim a save didn't happen.
+    await expect(store.updateMoodEntry('older', 10, 'great')).resolves.toBeUndefined();
+
+    expect(store.getMoodEntries().find((e) => e.id === 'older')?.score).toBe(10);
+    expect(lastWrite(storage).find((e) => e.id === 'older')?.score).toBe(10);
+    expect(alsoNotified).toHaveBeenCalledTimes(1);
+    consoleError.mockRestore();
+  });
+
+  it('does not lock the store out of saving when a subscriber throws during hydration', async () => {
+    const { store, storage } = freshStore(SEED);
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+    delayReads(storage);
+    store.subscribeToMoodStore(() => {
+      throw new Error('listener blew up');
+    });
+
+    // Hydration's promise is cached forever and awaited by every mutation, so
+    // letting a listener reject it would kill saving for the whole session.
+    await expect(store.loadMoodEntries()).resolves.toBeUndefined();
+    await expect(store.addMoodEntry(5, 'still works')).resolves.toBeUndefined();
+
+    expect(store.getMoodEntries()).toHaveLength(3);
+    consoleError.mockRestore();
   });
 });

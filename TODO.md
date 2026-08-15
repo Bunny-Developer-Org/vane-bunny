@@ -16,15 +16,14 @@ account (and optionally an Expo account for EAS builds).
 - [ ] Decide whether app-reinstall data loss (no cloud backup, by design —
       see README's privacy stance) needs a warning somewhere in the UI, e.g.
       before uninstalling or on first launch
-- [ ] Known bug, found while adding entry editing: if the initial read from
-      on-device storage _fails_ (as opposed to finding nothing), the store
-      falls back to an empty list and marks itself loaded, so the next save
-      writes that one entry over the whole stored history. Distinguishing
-      "read failed" from "nothing stored yet" and refusing to persist in the
-      first case would fix it, but it needs a UI decision about what the
-      check-in screen shows when storage is unreadable. The related timing
-      bug — mutations running before hydration finished — is already fixed
-      (see CHANGELOG), this is the error path only.
+- [ ] Decide what the check-in screen shows when on-device storage can't be
+      read. The store no longer overwrites data it failed to load — it
+      refuses the write and rejects (see CHANGELOG) — but the check-in
+      screen only `console.error`s a failed save, so the button just resets
+      and nothing tells the user why nothing saved. The edit screen does
+      show a message; the two should agree. Note the refusal is
+      unrecoverable from inside the app: if storage stays unreadable, the
+      app can be used but never saves again.
 
 ## 2. Play Store compliance basics
 
@@ -49,6 +48,14 @@ leaves the device:
 - [ ] Fill out Play Console's **Data safety** section as **"No data
       collected"** — accurate here since there's no account, no analytics,
       no crash reporting, no network calls at all
+- [ ] Decide, deliberately, whether to set `android.allowBackup: false` in
+      `app.json`. Expo's default is `true`, so Android's OS-level backup can
+      copy the app's on-device storage to the user's Google Drive. The app
+      itself still sends nothing — and store builds have no `INTERNET`
+      permission — but the privacy policy's "nothing about the change is
+      sent anywhere" is a stronger claim than the config currently backs.
+      Either turn the backup off or keep it knowingly (it's also the only
+      thing that survives a reinstall, which the item above is about)
 - [ ] Complete the **content rating** questionnaire
 - [ ] Set **target audience** (general wellness journaling app, not for
       children — set age targeting accordingly)
@@ -96,10 +103,16 @@ leaves the device:
 
 ## 4. Play Console listing
 
-- [x] All listing text and graphics prepared in `store-assets/` — title,
-      short/full description in `listing.md`, `icon-512.png`,
-      `feature-graphic-1024x500.png`, and 4 real phone screenshots in
-      `screenshots/` (generated from the actual running app, not mockups)
+- [x] All listing text and graphics prepared in `store-assets/` — title and
+      short/full description in `listing-EN.md` / `listing-PL.md`
+      (`listing.md` is now just an index plus the shared graphics specs),
+      `icon-512.png`, `feature-graphic-1024x500.png`, and 4 real phone
+      screenshots in `screenshots/mobile/` (generated from the actual
+      running app, not mockups — `screenshots/web/` is reference only,
+      don't upload it)
+- [ ] Recapture `store-assets/screenshots/mobile/3-day-detail.png` before
+      uploading the listing — it predates entry editing, so its rows show
+      only a Delete action and no "edited" marker
 - [x] Create the app in Play Console, set package name `com.bunnydeveloper.vanebunny`
 - [ ] Paste in the store listing text and upload the graphics from
       `store-assets/`

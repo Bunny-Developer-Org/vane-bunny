@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import {
   ActivityIndicator,
@@ -40,6 +40,13 @@ export default function EditEntry() {
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
   const savingRef = useRef(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const entry = entries.find((candidate) => candidate.id === id);
 
@@ -55,7 +62,33 @@ export default function EditEntry() {
   const dirty =
     entry !== undefined &&
     draft !== null &&
-    (draft.score !== entry.score || draft.note.trim() !== (entry.note ?? ''));
+    // Both sides trimmed: the store trims on the way in, so a stored note
+    // should already match — but an untrimmed legacy one would otherwise open
+    // the form pre-dirty and let an untouched visit stamp `updatedAt`.
+    (draft.score !== entry.score || draft.note.trim() !== (entry.note ?? '').trim());
+
+  // `router.back()` does nothing when this route was opened directly rather
+  // than pushed — a pasted web URL or a `vanebunny://` link — which would
+  // strand the user here, and after a save would leave the button spinning
+  // on a screen that never goes away. Fall back to the day the entry belongs
+  // to, which is where the push would have come from.
+  function dismiss() {
+    if (router.canGoBack()) {
+      router.back();
+    } else if (entry) {
+      router.replace({ pathname: '/day/[date]', params: { date: toDateKey(entry.timestamp) } });
+    } else {
+      router.replace('/history');
+    }
+  }
+
+  function editDraft(change: Partial<Omit<Draft, 'entryId'>>) {
+    // Any edit clears a previous failure notice — leaving it up while the
+    // user reworks the check-in would keep blaming a save they've moved on
+    // from.
+    setFailed(false);
+    setDraft((current) => (current ? { ...current, ...change } : current));
+  }
 
   async function handleSave() {
     // Synchronous guard against a double-tap landing before `saving` disables
@@ -66,9 +99,12 @@ export default function EditEntry() {
     setFailed(false);
     try {
       await updateMoodEntry(draft.entryId, draft.score, draft.note);
+      // If the user already navigated away while the write was in flight,
+      // dismissing now would pop the day screen out from under them too.
+      if (!mountedRef.current) return;
       // Deliberately leaves `saving` set: the screen is on its way out, and
       // clearing it would flash the button back to its idle state first.
-      router.back();
+      dismiss();
     } catch (err) {
       console.error('Failed to update entry', err);
       setFailed(true);
@@ -79,7 +115,7 @@ export default function EditEntry() {
 
   const header = (
     <View style={styles.header}>
-      <Pressable onPress={() => router.back()} hitSlop={12}>
+      <Pressable onPress={dismiss} hitSlop={12}>
         <Text style={styles.back}>{t('common.back')}</Text>
       </Pressable>
     </View>
@@ -120,7 +156,7 @@ export default function EditEntry() {
 
         <MoodPicker
           value={draft?.score ?? entry.score}
-          onChange={(score) => setDraft((current) => (current ? { ...current, score } : current))}
+          onChange={(score) => editDraft({ score })}
         />
 
         <TextInput
@@ -128,14 +164,21 @@ export default function EditEntry() {
           placeholder={t('checkIn.notePlaceholder')}
           placeholderTextColor={palette.inkFaint}
           value={draft?.note ?? ''}
-          onChangeText={(note) => setDraft((current) => (current ? { ...current, note } : current))}
+          onChangeText={(note) => editDraft({ note })}
           multiline
           maxLength={200}
         />
       </ScrollView>
 
-      <View style={styles.footer}>
-        {failed ? <Text style={styles.error}>{t('editEntry.saveError')}</Text> : null}
+      {/* Unlike the check-in screen, nothing sits below this footer to absorb
+          the safe-area inset — under Android's edge-to-edge window the button
+          would otherwise run underneath the navigation bar. */}
+      <View style={[styles.footer, { paddingBottom: spacing.lg + insets.bottom }]}>
+        {failed ? (
+          <Text style={styles.error} accessibilityLiveRegion="polite">
+            {t('editEntry.saveError')}
+          </Text>
+        ) : null}
         <PrimaryButton
           label={t('editEntry.save')}
           onPress={handleSave}
@@ -204,7 +247,7 @@ function createStyles(colors: Palette) {
     footer: {
       paddingHorizontal: spacing.xl,
       paddingTop: spacing.md,
-      paddingBottom: spacing.lg,
+      // paddingBottom is applied inline — it has to carry the safe-area inset.
       backgroundColor: colors.background,
       borderTopWidth: 1,
       borderTopColor: colors.border,

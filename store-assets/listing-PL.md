@@ -15,7 +15,7 @@ Vane Bunny
 Śledź swój nastrój w skali 1-10. Ze 100% prywatnością!
 ```
 
-## Pełny opis (1481/4000 znaków)
+## Pełny opis (1477/4000 znaków)
 
 ```
 Vane Bunny to łagodna, minimalistyczna aplikacja do śledzenia nastroju.
@@ -27,9 +27,9 @@ Zarejestruj swój nastrój od 1 do 10 tyle razy dziennie, ile chcesz, z
 opcjonalną krótką notatką. Całe sprawdzenie zajmuje mniej niż 10 sekund.
 Zobacz średnią i medianę dla dzisiaj prosto na ekranie sprawdzenia, i
 przeglądaj swoją historię dzień po dniu — dotknij dowolny dzień, aby
-zobaczyć poszczególne wpisy za nim stojące. Wpisałeś zły wynik albo chcesz
-coś dopisać? Każdy wcześniejszy wpis możesz edytować — zachowa godzinę, o
-której naprawdę powstał.
+zobaczyć poszczególne wpisy za nim stojące. Nie ta ocena albo chcesz coś
+dopisać? Każdy wcześniejszy wpis możesz edytować — zachowa godzinę, o
+której faktycznie powstał.
 
 PRYWATNOŚĆ PROJEKTOWA
 Vane Bunny nic nie zbiera. Nie ma konta, nie ma logowania, nie ma
