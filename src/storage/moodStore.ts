@@ -5,7 +5,10 @@ import type { MoodEntry } from '../types';
 const STORAGE_KEY = 'vane-bunny/mood-entries';
 
 type Listener = () => void;
-type StoredEntry = Omit<MoodEntry, 'timestamp'> & { timestamp: string };
+type StoredEntry = Omit<MoodEntry, 'timestamp' | 'updatedAt'> & {
+  timestamp: string;
+  updatedAt?: string;
+};
 
 let entries: MoodEntry[] = [];
 let loaded = false;
@@ -34,6 +37,7 @@ async function persistEntries(list: MoodEntry[]): Promise<void> {
   const payload: StoredEntry[] = list.map((entry) => ({
     ...entry,
     timestamp: entry.timestamp.toISOString(),
+    updatedAt: entry.updatedAt ? entry.updatedAt.toISOString() : undefined,
   }));
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
 }
@@ -44,6 +48,13 @@ async function persistEntries(list: MoodEntry[]): Promise<void> {
 // writes land on disk in the order they were requested.
 function enqueueMutation(mutate: (current: MoodEntry[]) => MoodEntry[]): Promise<void> {
   const task = writeQueue.then(async () => {
+    // Never mutate a half-hydrated store. Until the initial read lands,
+    // `entries` is still the empty array it starts as, so persisting a
+    // mutation of it would write that one change over everything already on
+    // disk — a check-in saved during startup would wipe the whole history.
+    // `loadMoodEntries` dedupes to a single read and handles its own
+    // failures, so awaiting it here is cheap and can't reject.
+    await loadMoodEntries();
     const next = mutate(entries);
     await persistEntries(next);
     entries = next;
@@ -64,7 +75,11 @@ export function loadMoodEntries(): Promise<void> {
       if (raw) {
         const parsed = JSON.parse(raw) as StoredEntry[];
         entries = parsed
-          .map((entry) => ({ ...entry, timestamp: new Date(entry.timestamp) }))
+          .map((entry) => ({
+            ...entry,
+            timestamp: new Date(entry.timestamp),
+            updatedAt: entry.updatedAt ? new Date(entry.updatedAt) : undefined,
+          }))
           .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
       }
     } catch (error) {
@@ -72,7 +87,15 @@ export function loadMoodEntries(): Promise<void> {
       entries = [];
     } finally {
       loaded = true;
-      notify();
+      try {
+        notify();
+      } catch (error) {
+        // `loadPromise` is cached forever and every mutation awaits it, so
+        // letting a throwing subscriber reject it here would lock the app
+        // out of saving for the rest of the session — long after the load
+        // itself succeeded.
+        console.error('A mood store listener threw while handling the load', error);
+      }
     }
   })();
   return loadPromise;
@@ -102,6 +125,25 @@ export function addMoodEntry(score: number, note: string): Promise<void> {
     },
     ...current,
   ]);
+}
+
+// Edits an existing entry in place. `timestamp` is deliberately left alone —
+// an edited check-in still belongs to the moment it was logged, so it keeps
+// its position in its day — and `updatedAt` records that it was changed.
+export function updateMoodEntry(id: string, score: number, note: string): Promise<void> {
+  const trimmedNote = note.trim();
+  return enqueueMutation((current) =>
+    current.map((entry) =>
+      entry.id === id
+        ? {
+            ...entry,
+            score,
+            note: trimmedNote ? trimmedNote : undefined,
+            updatedAt: new Date(),
+          }
+        : entry,
+    ),
+  );
 }
 
 export function deleteMoodEntry(id: string): Promise<void> {

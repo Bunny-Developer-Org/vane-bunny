@@ -72,7 +72,11 @@ export default function DayDetail() {
           contentContainerStyle={styles.listContent}
           ItemSeparatorComponent={() => <View style={{ height: spacing.sm }} />}
           renderItem={({ item }) => (
-            <EntryListItem entry={item} onDelete={() => setPendingDeleteId(item.id)} />
+            <EntryListItem
+              entry={item}
+              onEdit={() => router.push({ pathname: '/entry/[id]', params: { id: item.id } })}
+              onDelete={() => setPendingDeleteId(item.id)}
+            />
           )}
         />
       )}

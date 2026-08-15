@@ -6,6 +6,16 @@ follows [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Fixed
+
+- **Saving a check-in while the app was still starting up wiped the
+  stored history.** Store mutations ran independently of the initial
+  read from on-device storage, so one issued before hydration finished
+  built its result from the still-empty in-memory list and persisted
+  that over everything on disk — losing every earlier entry
+  irrecoverably. `add`/`update`/`delete` now await the initial load
+  before mutating. Found while adding tests around the new edit feature;
+  the bug predates it and could be hit from the check-in screen, which
+  renders its save button before the store has loaded.
 - Realigned every native dependency to its Expo SDK 57 pin, which
   `expo-doctor` was flagging and which made the app unrunnable in Expo Go
   (it crashed on launch with "Native module is null" from AsyncStorage and
@@ -39,6 +49,7 @@ follows [Keep a Changelog](https://keepachangelog.com/).
   real app icon.
 
 ### Removed
+
 - `newArchEnabled` from `app.json` — the New Architecture is unconditional
   from Expo SDK 55 onward, so the key is no longer part of the config
   schema and `expo-doctor` rejected it.
@@ -53,6 +64,7 @@ follows [Keep a Changelog](https://keepachangelog.com/).
   layers without a themed-icon monochrome variant.
 
 ### Changed
+
 - `app.config.js` now takes Expo's `({ config })` argument — the values
   from `app.json`, which Expo reads first — instead of `require`-ing
   `app.json` itself and returning a freshly built object. Same resolved
@@ -66,6 +78,29 @@ follows [Keep a Changelog](https://keepachangelog.com/).
   captures at a real 1080×2340 phone viewport).
 
 ### Added
+
+- **Editing a past check-in.** Each entry on a day's detail screen now has
+  an "Edit" action next to "Delete", opening a full-screen form
+  (`app/entry/[id].tsx`) with the same mood picker and note field as the
+  check-in screen, pre-filled with what was logged. Previously the only
+  way to correct a typo or a mis-tapped score was to delete the entry and
+  log a new one, which moved it to the current time and so quietly
+  rewrote when it happened.
+  - The score is editable alongside the note. A check-in is one thing —
+    showing its note in an edit form while locking the score it belongs
+    to would be the odd behaviour — and a mis-tapped score was the case
+    delete-and-relog handled worst.
+  - `timestamp` is never touched by an edit, so a corrected entry keeps
+    its place in its day and the day's average/median stay attached to
+    when the check-in actually happened.
+  - Entries carry a new optional `updatedAt`, set only when an edit
+    actually changes something, and the entry row shows a quiet "edited"
+    marker once it's set. Saving is disabled until score or note differs
+    from what's stored, so opening the form and backing out never marks
+    an entry as edited.
+  - No storage migration: `updatedAt` is absent on every entry written
+    before this, and absent is exactly what "never edited" means, so the
+    existing on-device store loads unchanged.
 - `store-assets/screenshots/mobile/` — four Play Store-ready screenshots
   (check-in, history, day detail, settings) captured from the actual
   running app at a real phone viewport size, replacing the wide desktop

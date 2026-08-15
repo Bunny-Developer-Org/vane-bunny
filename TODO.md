@@ -16,6 +16,15 @@ account (and optionally an Expo account for EAS builds).
 - [ ] Decide whether app-reinstall data loss (no cloud backup, by design —
       see README's privacy stance) needs a warning somewhere in the UI, e.g.
       before uninstalling or on first launch
+- [ ] Known bug, found while adding entry editing: if the initial read from
+      on-device storage _fails_ (as opposed to finding nothing), the store
+      falls back to an empty list and marks itself loaded, so the next save
+      writes that one entry over the whole stored history. Distinguishing
+      "read failed" from "nothing stored yet" and refusing to persist in the
+      first case would fix it, but it needs a UI decision about what the
+      check-in screen shows when storage is unreadable. The related timing
+      bug — mutations running before hydration finished — is already fixed
+      (see CHANGELOG), this is the error path only.
 
 ## 2. Play Store compliance basics
 

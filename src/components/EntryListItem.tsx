@@ -7,10 +7,11 @@ import type { MoodEntry } from '../types';
 
 interface EntryListItemProps {
   entry: MoodEntry;
+  onEdit?: () => void;
   onDelete?: () => void;
 }
 
-export function EntryListItem({ entry, onDelete }: EntryListItemProps) {
+export function EntryListItem({ entry, onEdit, onDelete }: EntryListItemProps) {
   const { palette } = useTheme();
   const { language, t } = useI18n();
   const styles = createStyles(palette);
@@ -22,17 +23,33 @@ export function EntryListItem({ entry, onDelete }: EntryListItemProps) {
       </View>
       <View style={styles.body}>
         {entry.note ? <Text style={styles.note}>{entry.note}</Text> : null}
-        <Text style={styles.time}>{formatTime(entry.timestamp, language)}</Text>
+        <Text style={styles.time}>
+          {formatTime(entry.timestamp, language)}
+          {entry.updatedAt ? ` · ${t('dayDetail.edited')}` : ''}
+        </Text>
       </View>
-      {onDelete ? (
-        <Pressable
-          onPress={onDelete}
-          hitSlop={8}
-          accessibilityLabel={t('dayDetail.deleteEntryLabel')}
-        >
-          <Text style={styles.delete}>{t('common.delete')}</Text>
-        </Pressable>
-      ) : null}
+      <View style={styles.actions}>
+        {onEdit ? (
+          <Pressable
+            onPress={onEdit}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={t('dayDetail.editEntryLabel')}
+          >
+            <Text style={styles.edit}>{t('common.edit')}</Text>
+          </Pressable>
+        ) : null}
+        {onDelete ? (
+          <Pressable
+            onPress={onDelete}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={t('dayDetail.deleteEntryLabel')}
+          >
+            <Text style={styles.delete}>{t('common.delete')}</Text>
+          </Pressable>
+        ) : null}
+      </View>
     </View>
   );
 }
@@ -72,6 +89,19 @@ function createStyles(colors: Palette) {
     time: {
       fontSize: 12,
       color: colors.inkMuted,
+    },
+    // spacing.md keeps the two labels' `hitSlop={8}` touch targets from
+    // meeting in the middle, where a tap between them would hit whichever
+    // Pressable happens to win.
+    actions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.md,
+    },
+    edit: {
+      fontSize: 12,
+      color: colors.sageDark,
+      fontWeight: '600',
     },
     delete: {
       fontSize: 12,

@@ -1,6 +1,6 @@
 # Vane Bunny
 
-A soft, minimal mood-tracking app. Log a mood score (1–10) as many times a day as you like — no daily limit, no clutter. Built with Expo (React Native), targeting Android and Web from one codebase.
+A soft, minimal mood-tracking app. Log a mood score (1–10) as many times a day as you like — no daily limit, no clutter. Past check-ins can be edited or deleted from the day they belong to, so a mistyped score or a note you'd rather rephrase isn't stuck there. Built with Expo (React Native), targeting Android and Web from one codebase.
 
 **Privacy stance:** nothing about you ever leaves the device. There's no login, no account, no server — mood entries live in local on-device storage only. This trades away cross-device sync (a device reinstall or switch loses your history) for having genuinely no personal data collection to reason about.
 
@@ -17,6 +17,7 @@ app/                      expo-router routes
   (tabs)/index.tsx           quick-add check-in screen (the default route)
   (tabs)/history.tsx         list of past days (avg/median)
   day/[date].tsx              individual entries for one day
+  entry/[id].tsx              edit one past check-in (mood + note)
 src/
   components/               MoodPicker, DaySummaryCard, EntryListItem, ...
   storage/moodStore.ts      local on-device store (AsyncStorage) + pub-sub for React
@@ -35,8 +36,11 @@ Everything lives under a single AsyncStorage key (`vane-bunny/mood-entries`) as 
   score: number   // 1-10
   note?: string
   timestamp: string  // ISO 8601
+  updatedAt?: string // ISO 8601, present only once the entry has been edited
 }
 ```
+
+Editing an entry overwrites its `score` and `note` in place and stamps `updatedAt`; `timestamp` is deliberately left alone, so an edited check-in keeps the position in its day that it was logged at. `updatedAt` is absent on entries that have never been edited — including everything stored before editing existed — so old data loads as-is and there's no migration to run.
 
 Daily average/median are computed client-side from that day's entries on every read — there's no backend to push the computation to, and at this data volume it doesn't need one.
 
@@ -62,7 +66,7 @@ No environment variables, no setup steps beyond `npm install` — there's nothin
 npm test
 ```
 
-Unit tests cover the pure logic in `src/utils/stats.ts` and `src/utils/date.ts` (average/median edge cases, local-timezone day bucketing, day-label formatting) via Jest + ts-jest — no React Native rendering involved, so there's no `jest-expo` dependency to manage.
+Unit tests cover the pure logic in `src/utils/` — `stats.ts` (average/median edge cases), `date.ts` (local-timezone day bucketing, day-label formatting) and `encouragement.ts` — plus `src/storage/moodStore.ts`, whose load/add/update/delete behaviour runs against an in-memory `jest.mock` of `@react-native-async-storage/async-storage` instead of the real native module. It's all Jest + ts-jest in plain Node: no React Native rendering involved, so there's no `jest-expo` dependency to manage.
 
 ## Building for Android (EAS)
 
@@ -87,7 +91,7 @@ npm run submit:android   # uploads the latest production build to Play Console
 
 The job runs `eas build --platform android --profile production --auto-submit --no-wait`. The `--no-wait` flag is deliberate: the actual build compile and Play Store upload happen entirely on Expo's (EAS's) infrastructure, not the GitHub runner, so the CI job just queues both and exits in under a minute instead of blocking (and burning GitHub Actions minutes) for the ~15-20 minutes a full build + submit takes.
 
-Trade-off: because of `--no-wait`, the GitHub Actions run only confirms that the build and submission were successfully *queued* — not that they actually succeeded. Check [expo.dev](https://expo.dev) (the project's Builds/Submissions dashboard) for real status. There's no feedback loop back into GitHub yet (e.g. a Slack ping or a status check once the build/submit finishes) — that's a possible future improvement, not currently wired up.
+Trade-off: because of `--no-wait`, the GitHub Actions run only confirms that the build and submission were successfully _queued_ — not that they actually succeeded. Check [expo.dev](https://expo.dev) (the project's Builds/Submissions dashboard) for real status. There's no feedback loop back into GitHub yet (e.g. a Slack ping or a status check once the build/submit finishes) — that's a possible future improvement, not currently wired up.
 
 Two repository secrets must be set under Settings → Secrets and variables → Actions before the workflow can run:
 
