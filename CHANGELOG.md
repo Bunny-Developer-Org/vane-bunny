@@ -36,6 +36,16 @@ that build.
   touching healthy entries. Such rows are now dropped as the store
   loads; an unreadable `updatedAt` just costs that entry its "edited"
   marker.
+- **A screen opened directly — a `vanebunny://` link, a reloaded web
+  URL — had a dead Back control**, because the stack started on that
+  screen with nothing beneath it to pop. The root layout now anchors the
+  tab navigator under deep-linked routes. Pre-existing on the day and
+  privacy screens; the edit screen would have inherited it.
+- **A refused write is now reported instead of passing silently.** The
+  check-in screen showed no toast and cleared nothing (it previously
+  showed a thank-you for a save that had in fact destroyed data), and
+  deleting closed its dialog over an entry that was still there. Both
+  now surface the failure and keep what you typed.
 - **A throwing store subscriber could report a successful save as
   failed.** Notification happened after the write had already committed
   but outside any guard, so one bad listener rejected the mutation —

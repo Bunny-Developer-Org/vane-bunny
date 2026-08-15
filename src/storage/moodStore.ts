@@ -12,8 +12,7 @@ type StoredEntry = Omit<MoodEntry, 'timestamp' | 'updatedAt'> & {
 
 let entries: MoodEntry[] = [];
 let loaded = false;
-let loadFailed = false;
-let loadPromise: Promise<void> | null = null;
+let loadPromise: Promise<boolean> | null = null;
 // Serializes mutations so overlapping add/delete calls can't race each
 // other's AsyncStorage writes, and each mutation always starts from the
 // latest committed state rather than a stale snapshot taken at call time.
@@ -57,6 +56,19 @@ function hydrateEntry(stored: StoredEntry): MoodEntry | null {
     console.error('Discarding an unreadable stored mood entry', stored);
     return null;
   }
+  // The rest of the app takes these at their word — a numeric `note` would
+  // reach `TextInput` and `.trim()`, a non-numeric `score` would turn a day's
+  // average into NaN — so a row is only worth keeping if its fields are the
+  // types they claim to be.
+  if (
+    typeof stored.id !== 'string' ||
+    typeof stored.score !== 'number' ||
+    Number.isNaN(stored.score) ||
+    (stored.note !== undefined && typeof stored.note !== 'string')
+  ) {
+    console.error('Discarding a malformed stored mood entry', stored.id);
+    return null;
+  }
   const timestamp = new Date(stored.timestamp);
   if (Number.isNaN(timestamp.getTime())) {
     console.error('Discarding a stored mood entry with an unreadable timestamp', stored.id);
@@ -93,9 +105,10 @@ function enqueueMutation(mutate: (current: MoodEntry[]) => MoodEntry[]): Promise
     // disk — a check-in saved during startup would wipe the whole history.
     // `loadMoodEntries` dedupes to a single read and never rejects, so
     // awaiting it here is cheap — but it can come back having failed, which
-    // is what the next check is for.
-    await loadMoodEntries();
-    if (loadFailed) {
+    // is what the next check is for. Its outcome rides on the promise rather
+    // than a module flag, so nothing can change it between the two lines.
+    const readSucceeded = await loadMoodEntries();
+    if (!readSucceeded) {
       // The read failed, so the empty `entries` is a fallback, not a fact
       // about what's on disk. Writing now would put this one change over a
       // history we simply couldn't read. Refuse instead — the data survives,
@@ -114,10 +127,13 @@ function enqueueMutation(mutate: (current: MoodEntry[]) => MoodEntry[]): Promise
   return task;
 }
 
-export function loadMoodEntries(): Promise<void> {
+// Resolves to whether the read actually succeeded. `false` means `entries` is
+// an empty fallback rather than a reading of what's on disk, which is the
+// difference between "no check-ins yet" and "don't write over this". Never
+// rejects.
+export function loadMoodEntries(): Promise<boolean> {
   if (loadPromise) return loadPromise;
-  loadPromise = (async () => {
-    loadFailed = false;
+  const attempt = (async () => {
     try {
       const raw = await AsyncStorage.getItem(STORAGE_KEY);
       if (raw) {
@@ -130,24 +146,29 @@ export function loadMoodEntries(): Promise<void> {
           .filter((entry): entry is MoodEntry => entry !== null)
           .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
       }
+      return true;
     } catch (error) {
       // `entries` stays empty so the app still renders, but this is a
-      // fallback, not a reading of what's on disk — `loadFailed` stops
+      // fallback, not a reading of what's on disk, and the `false` keeps
       // mutations from treating it as one and writing over the real data.
       console.error('Failed to load mood entries', error);
       entries = [];
-      loadFailed = true;
-      // Drop the cached promise so the next call reads again instead of
-      // replaying this failure for the life of the process — a read that
-      // failed once at startup may well succeed by the time something tries
-      // to save.
-      loadPromise = null;
+      return false;
     } finally {
       loaded = true;
       notify();
     }
   })();
-  return loadPromise;
+  // Drop the cache on failure so the next call reads again rather than
+  // replaying this one for the life of the process — a read that failed at
+  // startup may well succeed by the time something tries to save. Chained
+  // rather than done inside the body above, which would run before the
+  // assignment below and so be undone by it.
+  void attempt.then((succeeded) => {
+    if (!succeeded && loadPromise === attempt) loadPromise = null;
+  });
+  loadPromise = attempt;
+  return attempt;
 }
 
 export function isMoodStoreLoaded(): boolean {

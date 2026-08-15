@@ -10,22 +10,34 @@ account (and optionally an Expo account for EAS builds).
       with real Vane Bunny artwork (abstract, no literal mood iconography —
       see Design direction in README.md)
 - [ ] Test the full flow on a physical Android device / emulator, not just
-      web (`npm run android`)
+      web (`npm run android`). Two things to look at specifically, both
+      reasoned from source rather than observed: the edit screen's footer
+      adds `insets.bottom`, but safe-area insets don't shrink when the IME
+      opens, so with the keyboard up the Save button may float an extra
+      ~24-48dp above it; and deep-linking `vanebunny://entry/<id>` should
+      now land with the tabs mounted beneath it (`unstable_settings.anchor`
+      in `app/_layout.tsx`) so Back works
+- [ ] The "‹ Back" links on the day, entry and privacy screens are bare
+      15px text with `hitSlop` — which react-native-web doesn't implement,
+      so on web their click target is the glyph box. Same fix the entry
+      row's actions got (real padding instead of slop), applied to all
+      three at once
+- [ ] No test harness for components or routes: `jest.config.js` is
+      `testEnvironment: 'node'` and only matches `*.test.ts`, so `.tsx` is
+      excluded outright. The store is well covered; every UI regression
+      found so far was caught by reading, not by tests. Adding `jest-expo` + `@testing-library/react-native` would cover the screens
 - [ ] Decide on and write real copy for empty states etc. if the current
       placeholder text isn't final
 - [ ] Decide whether app-reinstall data loss (no cloud backup, by design —
       see README's privacy stance) needs a warning somewhere in the UI, e.g.
       before uninstalling or on first launch
-- [ ] Decide what the check-in screen shows when on-device storage can't be
-      read. The store no longer overwrites data it failed to load — it
-      refuses the write and rejects (see CHANGELOG) — but the check-in
-      screen only `console.error`s a failed save, so the button just resets
-      and nothing tells the user why nothing saved. The edit screen does
-      show a message; the two should agree. The History screen has the same
-      gap from the other side: a failed read marks the store loaded with an
-      empty list, so it renders "Nothing here yet" about entries it couldn't
-      read. Exposing the failure from the store (rather than only logging
-      it) is what both screens would need.
+- [ ] Decide what the History screen shows when on-device storage can't be
+      read. All three write paths now report a refused save (see CHANGELOG),
+      but reads have the same gap from the other side: a failed read marks
+      the store loaded with an empty list, so History renders its cheerful
+      "Nothing here yet" about entries it simply couldn't read. The store
+      knows — `loadMoodEntries` resolves `false` — it just isn't exposed to
+      the hook, so `useMoodEntries` would need to carry it through.
 
 ## 2. Play Store compliance basics
 

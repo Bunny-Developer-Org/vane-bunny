@@ -310,7 +310,8 @@ describe('when stored data cannot be read', () => {
     mockStorage.value = '{"oops":true}';
     const { store, storage } = freshStore();
 
-    await expect(store.loadMoodEntries()).resolves.toBeUndefined();
+    // The load resolves — it never rejects — but reports that it failed.
+    await expect(store.loadMoodEntries()).resolves.toBe(false);
 
     expect(store.isMoodStoreLoaded()).toBe(true);
     expect(store.getMoodEntries()).toEqual([]);
@@ -443,9 +444,10 @@ describe('subscribeToMoodStore', () => {
       throw new Error('listener blew up');
     });
 
-    // Hydration's promise is cached forever and awaited by every mutation, so
-    // letting a listener reject it would kill saving for the whole session.
-    await expect(store.loadMoodEntries()).resolves.toBeUndefined();
+    // Hydration's promise is cached and awaited by every mutation, so letting
+    // a listener reject it — or report the read as failed — would kill saving
+    // for the whole session.
+    await expect(store.loadMoodEntries()).resolves.toBe(true);
     await expect(store.addMoodEntry(5, 'still works')).resolves.toBeUndefined();
 
     expect(store.getMoodEntries()).toHaveLength(3);

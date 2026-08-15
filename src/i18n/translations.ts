@@ -22,6 +22,7 @@ const en = {
   'checkIn.checkInMany': 'check-ins',
   'checkIn.notePlaceholder': 'Add a short note (optional)',
   'checkIn.save': 'Save check-in',
+  'checkIn.saveError': 'Couldn’t save that check-in. Please try again.',
 
   'moodPicker.outOf10': 'out of 10',
   'moodPicker.moodLabel': 'Mood {{score}} of 10',
@@ -35,8 +36,9 @@ const en = {
   'dayDetail.deleteMessage': 'This can’t be undone.',
   // Interpolated so a screen reader can tell a day's entries apart — several
   // rows of a bare "Edit entry" would all read identically.
-  'dayDetail.deleteEntryLabel': 'Delete check-in {{score}} at {{time}}',
-  'dayDetail.editEntryLabel': 'Edit check-in {{score}} at {{time}}',
+  'dayDetail.deleteEntryLabel': 'Delete check-in scored {{score}} at {{time}}',
+  'dayDetail.editEntryLabel': 'Edit check-in scored {{score}} at {{time}}',
+  'dayDetail.deleteError': 'Couldn’t delete that check-in. Please try again.',
   'dayDetail.edited': 'edited',
 
   'editEntry.title': 'Edit check-in',
@@ -101,6 +103,7 @@ const pl: Record<TranslationKey, string> = {
   'checkIn.checkInMany': 'wpisów',
   'checkIn.notePlaceholder': 'Dodaj krótką notatkę (opcjonalnie)',
   'checkIn.save': 'Zapisz wpis',
+  'checkIn.saveError': 'Nie udało się zapisać wpisu. Spróbuj ponownie.',
 
   'moodPicker.outOf10': 'na 10',
   'moodPicker.moodLabel': 'Nastrój {{score}} na 10',
@@ -112,8 +115,9 @@ const pl: Record<TranslationKey, string> = {
   'dayDetail.noEntries': 'Brak wpisów tego dnia.',
   'dayDetail.deleteTitle': 'Usunąć ten wpis?',
   'dayDetail.deleteMessage': 'Tej operacji nie można cofnąć.',
-  'dayDetail.deleteEntryLabel': 'Usuń wpis {{score}} z godziny {{time}}',
-  'dayDetail.editEntryLabel': 'Edytuj wpis {{score}} z godziny {{time}}',
+  'dayDetail.deleteEntryLabel': 'Usuń wpis z oceną {{score}} z godziny {{time}}',
+  'dayDetail.editEntryLabel': 'Edytuj wpis z oceną {{score}} z godziny {{time}}',
+  'dayDetail.deleteError': 'Nie udało się usunąć wpisu. Spróbuj ponownie.',
   'dayDetail.edited': 'edytowano',
 
   'editEntry.title': 'Edycja wpisu',
