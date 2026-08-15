@@ -21,9 +21,11 @@ account (and optionally an Expo account for EAS builds).
       refuses the write and rejects (see CHANGELOG) — but the check-in
       screen only `console.error`s a failed save, so the button just resets
       and nothing tells the user why nothing saved. The edit screen does
-      show a message; the two should agree. Note the refusal is
-      unrecoverable from inside the app: if storage stays unreadable, the
-      app can be used but never saves again.
+      show a message; the two should agree. The History screen has the same
+      gap from the other side: a failed read marks the store loaded with an
+      empty list, so it renders "Nothing here yet" about entries it couldn't
+      read. Exposing the failure from the store (rather than only logging
+      it) is what both screens would need.
 
 ## 2. Play Store compliance basics
 

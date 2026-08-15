@@ -75,6 +75,8 @@ const SEED: StoredEntry[] = [
   },
 ];
 
+const GOOD_ROW: StoredEntry = { id: 'good', score: 5, timestamp: '2026-01-05T08:00:00.000Z' };
+
 beforeEach(() => {
   mockStorage.value = null;
   jest.resetModules();
@@ -317,6 +319,25 @@ describe('when stored data cannot be read', () => {
     expect(mockStorage.value).toBe('{"oops":true}');
   });
 
+  it.each([
+    ['null', null],
+    ['a primitive', 42],
+  ])('drops %s row without treating the whole file as unreadable', async (_label, junk) => {
+    mockStorage.value = JSON.stringify([junk, { ...GOOD_ROW }]);
+    const { store, storage } = freshStore();
+
+    await store.loadMoodEntries();
+
+    expect(store.getMoodEntries().map((e) => e.id)).toEqual(['good']);
+    // A junk row used to throw out of the hydration `map`, which the outer
+    // catch read as "the whole file is unreadable" — one bad element cost the
+    // history's writability for the rest of the session.
+    await expect(store.updateMoodEntry('good', 8, 'still writable')).resolves.toBeUndefined();
+    expect(lastWrite(storage).map((e) => e.id)).toEqual(['good']);
+    await expect(store.addMoodEntry(6, 'and another')).resolves.toBeUndefined();
+    expect(lastWrite(storage)).toHaveLength(2);
+  });
+
   it('drops a row with an unreadable timestamp instead of letting it block every write', async () => {
     const { store, storage } = freshStore([
       { id: 'good', score: 5, timestamp: '2026-01-05T08:00:00.000Z' },
@@ -330,6 +351,38 @@ describe('when stored data cannot be read', () => {
     // on the next write and leave the store permanently unwritable.
     await expect(store.updateMoodEntry('good', 8, 'still writable')).resolves.toBeUndefined();
     expect(lastWrite(storage).map((e) => e.id)).toEqual(['good']);
+  });
+
+  it('retries the read on the next attempt instead of caching the failure', async () => {
+    const { store, storage } = freshStore(SEED);
+    storage.getItem.mockRejectedValueOnce(new Error('bridge exploded'));
+
+    await expect(store.addMoodEntry(6, 'during the outage')).rejects.toThrow(
+      'refusing to overwrite stored data',
+    );
+    // Second attempt: the bridge is back, so the store must read again rather
+    // than replay the cached failure for the life of the process.
+    await expect(store.addMoodEntry(7, 'after recovery')).resolves.toBeUndefined();
+
+    expect(storage.getItem.mock.calls.length).toBeGreaterThan(1);
+    expect(store.getMoodEntries().map((e) => e.id)).toEqual([expect.any(String), 'newer', 'older']);
+    expect(lastWrite(storage).map((e) => e.id)).toEqual([expect.any(String), 'newer', 'older']);
+    expect(store.getMoodEntries()[0].note).toBe('after recovery');
+  });
+
+  it('re-reads on a second loadMoodEntries call after a failed one', async () => {
+    const { store, storage } = freshStore(SEED);
+    storage.getItem.mockRejectedValueOnce(new Error('bridge exploded'));
+
+    await store.loadMoodEntries();
+    expect(store.getMoodEntries()).toEqual([]);
+
+    // Proves the cached promise really was dropped: a failed load is not the
+    // one the next caller gets handed back.
+    await store.loadMoodEntries();
+
+    expect(storage.getItem).toHaveBeenCalledTimes(2);
+    expect(store.getMoodEntries().map((e) => e.id)).toEqual(['newer', 'older']);
   });
 
   it('keeps an entry whose updatedAt is unreadable, minus the edit stamp', async () => {
