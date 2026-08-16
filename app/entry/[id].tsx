@@ -43,6 +43,13 @@ export default function EditEntry() {
   const mountedRef = useRef(true);
 
   useEffect(() => {
+    // Set on the way in as well as cleared on the way out: an effect can run
+    // more than once for a single mount (Fast Refresh today, StrictMode's
+    // double-invoke if it's ever switched on), and without this the cleanup
+    // from the first run would leave the ref false forever — every later save
+    // would then return before `dismiss()`, leaving the entry saved but the
+    // button spinning on a screen that never goes away.
+    mountedRef.current = true;
     return () => {
       mountedRef.current = false;
     };

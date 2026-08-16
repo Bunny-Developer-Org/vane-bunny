@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -26,6 +26,14 @@ export default function DayDetail() {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [deleteFailed, setDeleteFailed] = useState(false);
   const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Going back within the toast's 3.5s life would otherwise leave the timer
+  // pending, firing setDeleteFailed against an unmounted screen.
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    };
+  }, []);
 
   const day = days.find((d) => d.dateKey === date);
 

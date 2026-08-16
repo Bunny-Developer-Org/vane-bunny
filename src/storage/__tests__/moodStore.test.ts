@@ -386,6 +386,28 @@ describe('when stored data cannot be read', () => {
     expect(store.getMoodEntries().map((e) => e.id)).toEqual(['newer', 'older']);
   });
 
+  it('keeps an entry whose note is null, minus the note', async () => {
+    const { store, storage } = freshStore([
+      { id: 'noteless', score: 5, note: null, timestamp: '2026-01-05T08:00:00.000Z' },
+      { ...GOOD_ROW },
+    ] as unknown as StoredEntry[]);
+
+    await store.loadMoodEntries();
+    const entry = store.getMoodEntries().find((e) => e.id === 'noteless') as MoodEntry;
+
+    // A null note says the same thing an absent one does, so discarding the
+    // row over it would throw away a readable score and timestamp — and the
+    // next mutation would then rewrite the array without it, for good.
+    expect(entry).toBeDefined();
+    expect(entry.score).toBe(5);
+    expect(entry.note).toBeUndefined();
+    expect(entry.timestamp.toISOString()).toBe('2026-01-05T08:00:00.000Z');
+
+    // The null must not ride the spread back out to disk either.
+    await store.updateMoodEntry('good', 8, 'unrelated edit');
+    expect(lastWrite(storage).find((e) => e.id === 'noteless')?.note).toBeUndefined();
+  });
+
   it('keeps an entry whose updatedAt is unreadable, minus the edit stamp', async () => {
     const { store } = freshStore([
       { id: 'edited', score: 5, timestamp: '2026-01-05T08:00:00.000Z', updatedAt: 'nonsense' },

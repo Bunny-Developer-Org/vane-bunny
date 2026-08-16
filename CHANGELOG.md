@@ -26,9 +26,9 @@ that build.
   remembered, and mutations refuse to write rather than overwrite data
   they couldn't see; the next attempt re-reads storage rather than
   replaying the failure, so a momentary read error doesn't leave the app
-  read-only until it's restarted. Saving reports the failure instead —
-  the edit screen shows it; the check-in screen still only logs to the
-  console (see `TODO.md`).
+  read-only until it's restarted. Saving reports the failure instead, on
+  the check-in screen as well as the edit screen, and what you typed is
+  kept rather than cleared.
 - **One entry with an unreadable date on disk broke every future save.**
   Hydration accepted an unparseable `timestamp` as an Invalid Date, and
   re-serializing the list then threw on it — so a single corrupt row

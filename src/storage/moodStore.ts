@@ -60,11 +60,18 @@ function hydrateEntry(stored: StoredEntry): MoodEntry | null {
   // reach `TextInput` and `.trim()`, a non-numeric `score` would turn a day's
   // average into NaN — so a row is only worth keeping if its fields are the
   // types they claim to be.
+  //
+  // A `note` of null is perfectly readable — it means the same thing as an
+  // absent one, and plenty of JSON encoders write an optional field out that
+  // way — so normalize it instead of throwing away the entry's score and
+  // timestamp along with it. Same reasoning as the `updatedAt` handling
+  // below: lose the field, not the check-in.
+  const note = stored.note === null ? undefined : stored.note;
   if (
     typeof stored.id !== 'string' ||
     typeof stored.score !== 'number' ||
     Number.isNaN(stored.score) ||
-    (stored.note !== undefined && typeof stored.note !== 'string')
+    (note !== undefined && typeof note !== 'string')
   ) {
     console.error('Discarding a malformed stored mood entry', stored.id);
     return null;
@@ -77,6 +84,8 @@ function hydrateEntry(stored: StoredEntry): MoodEntry | null {
   const updatedAt = stored.updatedAt ? new Date(stored.updatedAt) : undefined;
   return {
     ...stored,
+    // Explicit, so a null note from disk doesn't ride the spread back in.
+    note,
     timestamp,
     // An unreadable edit stamp only costs the "edited" marker, so it isn't
     // worth dropping the whole entry over.

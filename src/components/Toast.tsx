@@ -34,6 +34,17 @@ export function Toast({ message, accentColor, insetBottom }: ToastProps) {
     }
   }
 
+  // The accent has to be retained across the exit animation for the same
+  // reason the message is: callers derive it from the same state that goes
+  // null to dismiss the toast, so reading the live prop on the way out would
+  // repaint a red failure bar in the success accent as it slides away. Only
+  // tracked while visible, so a genuine accent change (a theme switch) still
+  // lands immediately.
+  const [displayAccent, setDisplayAccent] = useState(accentColor);
+  if (visible && accentColor !== displayAccent) {
+    setDisplayAccent(accentColor);
+  }
+
   useEffect(() => {
     if (visible) {
       Animated.timing(translateY, {
@@ -63,7 +74,7 @@ export function Toast({ message, accentColor, insetBottom }: ToastProps) {
       style={[
         styles.toast,
         {
-          backgroundColor: darken(accentColor, 0.4),
+          backgroundColor: darken(displayAccent, 0.4),
           paddingBottom: spacing.sm + insetBottom,
           transform: [{ translateY }],
         },

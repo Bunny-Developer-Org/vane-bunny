@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -34,6 +34,14 @@ export default function Log() {
   const [toast, setToast] = useState<{ message: string; failed: boolean } | null>(null);
   const savingRef = useRef(false);
   const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Same cleanup as the day screen: this tab unmounts on a tab switch, and a
+  // pending toast timer would then call setToast on a dead component.
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    };
+  }, []);
 
   const today = days.find((day) => day.dateKey === toDateKey(new Date()));
 
