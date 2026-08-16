@@ -4,6 +4,7 @@
 const en = {
   'common.cancel': 'Cancel',
   'common.delete': 'Delete',
+  'common.edit': 'Edit',
   'common.back': '‹ Back',
   'common.avg': 'avg',
   'common.average': 'average',
@@ -21,6 +22,7 @@ const en = {
   'checkIn.checkInMany': 'check-ins',
   'checkIn.notePlaceholder': 'Add a short note (optional)',
   'checkIn.save': 'Save check-in',
+  'checkIn.saveError': 'Couldn’t save that check-in. Please try again.',
 
   'moodPicker.outOf10': 'out of 10',
   'moodPicker.moodLabel': 'Mood {{score}} of 10',
@@ -32,7 +34,17 @@ const en = {
   'dayDetail.noEntries': 'No entries for this day.',
   'dayDetail.deleteTitle': 'Delete this entry?',
   'dayDetail.deleteMessage': 'This can’t be undone.',
-  'dayDetail.deleteEntryLabel': 'Delete entry',
+  // Interpolated so a screen reader can tell a day's entries apart — several
+  // rows of a bare "Edit entry" would all read identically.
+  'dayDetail.deleteEntryLabel': 'Delete check-in scored {{score}} at {{time}}',
+  'dayDetail.editEntryLabel': 'Edit check-in scored {{score}} at {{time}}',
+  'dayDetail.deleteError': 'Couldn’t delete that check-in. Please try again.',
+  'dayDetail.edited': 'edited',
+
+  'editEntry.title': 'Edit check-in',
+  'editEntry.save': 'Save changes',
+  'editEntry.notFound': 'This check-in is no longer here.',
+  'editEntry.saveError': 'Couldn’t save your changes. Please try again.',
 
   'settings.title': 'Settings',
   'settings.appearance': 'Appearance',
@@ -44,7 +56,7 @@ const en = {
     'Vane Bunny keeps everything on this device. No account, no analytics, no network calls.',
 
   'privacy.title': 'Privacy Policy',
-  'privacy.updated': 'Last updated: July 2026',
+  'privacy.updated': 'Last updated: August 2026',
   'privacy.summaryStrong': 'The short version: ',
   'privacy.summaryText':
     "Vane Bunny collects nothing. There's no account, no analytics, no crash reporting, and no network access at all. Everything you enter stays only on your device.",
@@ -54,9 +66,9 @@ const en = {
   'privacy.sectionStoreTitle': 'What the app stores, and where',
   'privacy.sectionStoreBody':
     "When you log a mood check-in (a score from 1–10 and an optional short note), it's saved using your device's local on-device storage only. It never leaves your device — not to a server, not to us, not to anyone.",
-  'privacy.sectionDeleteTitle': 'Deleting your data',
+  'privacy.sectionDeleteTitle': 'Editing and deleting your data',
   'privacy.sectionDeleteBody':
-    'You can delete an individual check-in at any time from within the app. Uninstalling the app removes all of its data from your device, since nothing exists anywhere else.',
+    "You can edit or delete an individual check-in at any time from within the app. Editing changes the entry in your device's local storage and nowhere else — no copy of the earlier version is kept, and nothing about the change is sent anywhere. Uninstalling the app removes all of its data from your device, since nothing exists anywhere else.",
   'privacy.sectionThirdPartyTitle': 'Third parties',
   'privacy.sectionThirdPartyBody':
     "None are involved. Vane Bunny doesn't share data with anyone because it doesn't collect or transmit any data in the first place.",
@@ -73,6 +85,7 @@ export type TranslationKey = keyof typeof en;
 const pl: Record<TranslationKey, string> = {
   'common.cancel': 'Anuluj',
   'common.delete': 'Usuń',
+  'common.edit': 'Edytuj',
   'common.back': '‹ Wstecz',
   'common.avg': 'śr.',
   'common.average': 'średnia',
@@ -90,6 +103,7 @@ const pl: Record<TranslationKey, string> = {
   'checkIn.checkInMany': 'wpisów',
   'checkIn.notePlaceholder': 'Dodaj krótką notatkę (opcjonalnie)',
   'checkIn.save': 'Zapisz wpis',
+  'checkIn.saveError': 'Nie udało się zapisać wpisu. Spróbuj ponownie.',
 
   'moodPicker.outOf10': 'na 10',
   'moodPicker.moodLabel': 'Nastrój {{score}} na 10',
@@ -101,7 +115,15 @@ const pl: Record<TranslationKey, string> = {
   'dayDetail.noEntries': 'Brak wpisów tego dnia.',
   'dayDetail.deleteTitle': 'Usunąć ten wpis?',
   'dayDetail.deleteMessage': 'Tej operacji nie można cofnąć.',
-  'dayDetail.deleteEntryLabel': 'Usuń wpis',
+  'dayDetail.deleteEntryLabel': 'Usuń wpis z oceną {{score}} z godziny {{time}}',
+  'dayDetail.editEntryLabel': 'Edytuj wpis z oceną {{score}} z godziny {{time}}',
+  'dayDetail.deleteError': 'Nie udało się usunąć wpisu. Spróbuj ponownie.',
+  'dayDetail.edited': 'edytowano',
+
+  'editEntry.title': 'Edycja wpisu',
+  'editEntry.save': 'Zapisz zmiany',
+  'editEntry.notFound': 'Tego wpisu już nie ma.',
+  'editEntry.saveError': 'Nie udało się zapisać zmian. Spróbuj ponownie.',
 
   'settings.title': 'Ustawienia',
   'settings.appearance': 'Wygląd',
@@ -113,7 +135,7 @@ const pl: Record<TranslationKey, string> = {
     'Vane Bunny przechowuje wszystko na tym urządzeniu. Bez konta, bez analityki, bez połączeń z siecią.',
 
   'privacy.title': 'Polityka prywatności',
-  'privacy.updated': 'Ostatnia aktualizacja: lipiec 2026',
+  'privacy.updated': 'Ostatnia aktualizacja: sierpień 2026',
   'privacy.summaryStrong': 'W skrócie: ',
   'privacy.summaryText':
     'Vane Bunny nic nie zbiera. Nie ma konta, analityki, raportowania awarii ani jakiegokolwiek dostępu do sieci. Wszystko, co wpiszesz, zostaje wyłącznie na Twoim urządzeniu.',
@@ -123,9 +145,9 @@ const pl: Record<TranslationKey, string> = {
   'privacy.sectionStoreTitle': 'Co aplikacja przechowuje i gdzie',
   'privacy.sectionStoreBody':
     'Gdy zapisujesz wpis nastroju (ocenę od 1 do 10 i opcjonalną krótką notatkę), jest on zapisywany wyłącznie w lokalnej pamięci Twojego urządzenia. Nigdy nie opuszcza urządzenia — ani na serwer, ani do nas, ani do nikogo innego.',
-  'privacy.sectionDeleteTitle': 'Usuwanie danych',
+  'privacy.sectionDeleteTitle': 'Edytowanie i usuwanie danych',
   'privacy.sectionDeleteBody':
-    'W dowolnym momencie możesz usunąć pojedynczy wpis w aplikacji. Odinstalowanie aplikacji usuwa wszystkie jej dane z urządzenia, ponieważ nic nie istnieje nigdzie indziej.',
+    'W dowolnym momencie możesz edytować lub usunąć pojedynczy wpis w aplikacji. Edycja zmienia ten wpis w lokalnej pamięci Twojego urządzenia i nigdzie indziej — nie zachowujemy kopii poprzedniej wersji, a informacja o zmianie nigdzie nie jest wysyłana. Odinstalowanie aplikacji usuwa wszystkie jej dane z urządzenia, ponieważ nic nie istnieje nigdzie indziej.',
   'privacy.sectionThirdPartyTitle': 'Strony trzecie',
   'privacy.sectionThirdPartyBody':
     'Żadne nie są zaangażowane. Vane Bunny nie udostępnia danych nikomu, ponieważ w ogóle ich nie zbiera ani nie przesyła.',

@@ -37,6 +37,14 @@ export function PrimaryButton({
     <Pressable
       onPress={onPress}
       disabled={disabled || loading}
+      accessibilityRole="button"
+      // The label is swapped for a spinner while loading, which would
+      // otherwise leave the button with no accessible name mid-save.
+      accessibilityLabel={label}
+      // Without this a disabled button is announced as if it were tappable —
+      // which matters most where a button starts out disabled, like the edit
+      // screen's Save.
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
       style={({ pressed }) => [
         styles.base,
         isGhost ? styles.ghost : { backgroundColor: fill },

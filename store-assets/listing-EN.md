@@ -9,13 +9,13 @@ Character counts are checked against Play's limits.
 Vane Bunny
 ```
 
-## Short description (61/80 chars)
+## Short description (59/80 chars)
 
 ```
 Track your daily mood with 1-10 scoring. With 100% privacy!
 ```
 
-## Full description (964/4000 chars)
+## Full description (1224/4000 chars)
 
 ```
 Vane Bunny is a soft, minimal mood check-in app. No feeds, no streaks to
@@ -26,12 +26,14 @@ Log a mood score from 1 to 10 as many times a day as you like, with an
 optional short note. The whole check-in takes under 10 seconds. See your
 average and median for today right on the check-in screen, and browse your
 history by day — tap into any day to see the individual entries behind it.
+Tap Edit on any past check-in to fix a number or reword a note; it keeps
+the time you actually logged it.
 
 PRIVATE BY DESIGN
 Vane Bunny collects nothing. There's no account, no sign-in, no analytics,
 no crash reporting, and no network access at all. Every check-in is stored
 only on your device. Nothing is ever sent anywhere — not to us, not to
-anyone. Delete any entry any time; uninstalling removes everything.
+anyone. Edit or delete any entry any time; uninstalling removes everything.
 
 CALM, NOT CLINICAL
 Soft, muted colors and rounded shapes throughout, with three gentle color

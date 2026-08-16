@@ -1,14 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ConfirmDialog } from '../../src/components/ConfirmDialog';
 import { EntryListItem } from '../../src/components/EntryListItem';
+import { Toast } from '../../src/components/Toast';
 import { useMoodEntries } from '../../src/hooks/useMoodEntries';
 import { pluralEntryKey, useI18n } from '../../src/i18n';
 import { deleteMoodEntry } from '../../src/storage/moodStore';
 import { useTheme, spacing, type Palette } from '../../src/theme';
 import { formatDayLabel } from '../../src/utils/date';
+
+const TOAST_DURATION_MS = 3500;
 
 export default function DayDetail() {
   const { date: rawDate } = useLocalSearchParams<{ date: string }>();
@@ -21,12 +24,30 @@ export default function DayDetail() {
   const { language, t } = useI18n();
   const styles = createStyles(palette);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [deleteFailed, setDeleteFailed] = useState(false);
+  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Going back within the toast's 3.5s life would otherwise leave the timer
+  // pending, firing setDeleteFailed against an unmounted screen.
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    };
+  }, []);
 
   const day = days.find((d) => d.dateKey === date);
 
   function runDelete() {
     if (!pendingDeleteId) return;
-    deleteMoodEntry(pendingDeleteId).catch((err) => console.error('Failed to delete entry', err));
+    // A delete can be refused — the store won't write when it couldn't read
+    // what's already stored — and the dialog closing over an entry that's
+    // still there would otherwise read as a bug in the list.
+    deleteMoodEntry(pendingDeleteId).catch((err) => {
+      console.error('Failed to delete entry', err);
+      setDeleteFailed(true);
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+      toastTimeoutRef.current = setTimeout(() => setDeleteFailed(false), TOAST_DURATION_MS);
+    });
     setPendingDeleteId(null);
   }
 
@@ -72,7 +93,11 @@ export default function DayDetail() {
           contentContainerStyle={styles.listContent}
           ItemSeparatorComponent={() => <View style={{ height: spacing.sm }} />}
           renderItem={({ item }) => (
-            <EntryListItem entry={item} onDelete={() => setPendingDeleteId(item.id)} />
+            <EntryListItem
+              entry={item}
+              onEdit={() => router.push({ pathname: '/entry/[id]', params: { id: item.id } })}
+              onDelete={() => setPendingDeleteId(item.id)}
+            />
           )}
         />
       )}
@@ -86,6 +111,12 @@ export default function DayDetail() {
         destructive
         onConfirm={runDelete}
         onCancel={() => setPendingDeleteId(null)}
+      />
+
+      <Toast
+        message={deleteFailed ? t('dayDetail.deleteError') : null}
+        accentColor={palette.danger}
+        insetBottom={insets.bottom}
       />
     </View>
   );

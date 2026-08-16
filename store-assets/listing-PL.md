@@ -3,7 +3,7 @@
 Skopiuj tekst z poniższych sekcji do Play Console dla listy w języku polskim.
 Liczba znaków jest sprawdzana względem limitów Play.
 
-## Tytuł aplikacji (11/30 znaków)
+## Tytuł aplikacji (10/30 znaków)
 
 ```
 Vane Bunny
@@ -15,7 +15,7 @@ Vane Bunny
 Śledź swój nastrój w skali 1-10. Ze 100% prywatnością!
 ```
 
-## Pełny opis (1089/4000 znaków)
+## Pełny opis (1477/4000 znaków)
 
 ```
 Vane Bunny to łagodna, minimalistyczna aplikacja do śledzenia nastroju.
@@ -27,14 +27,16 @@ Zarejestruj swój nastrój od 1 do 10 tyle razy dziennie, ile chcesz, z
 opcjonalną krótką notatką. Całe sprawdzenie zajmuje mniej niż 10 sekund.
 Zobacz średnią i medianę dla dzisiaj prosto na ekranie sprawdzenia, i
 przeglądaj swoją historię dzień po dniu — dotknij dowolny dzień, aby
-zobaczyć poszczególne wpisy za nim stojące.
+zobaczyć poszczególne wpisy za nim stojące. Nie ta ocena albo chcesz coś
+dopisać? Każdy wcześniejszy wpis możesz edytować — zachowa godzinę, o
+której faktycznie powstał.
 
 PRYWATNOŚĆ PROJEKTOWA
 Vane Bunny nic nie zbiera. Nie ma konta, nie ma logowania, nie ma
 analityki, nie ma raportowania błędów i nie ma żadnych połączeń sieciowych.
 Każde sprawdzenie nastroju przechowywane jest tylko na Twoim urządzeniu.
-Nic nigdy nie jest wysyłane — nie do nas, nie do nikogo. Usuń dowolny
-wpis w każdej chwili; odinstalowanie usunie wszystko.
+Nic nigdy nie jest wysyłane — nie do nas, nie do nikogo. Edytuj lub usuń
+dowolny wpis w każdej chwili; odinstalowanie usunie wszystko.
 
 SPOKOJNE, NIE KLINICZNE
 W całej aplikacji mamy łagodne, stonowane kolory i zaokrąglone kształty,

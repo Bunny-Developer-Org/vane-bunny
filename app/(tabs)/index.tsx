@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -31,11 +31,25 @@ export default function Log() {
   const [score, setScore] = useState<number | null>(null);
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
-  const [thankYou, setThankYou] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; failed: boolean } | null>(null);
   const savingRef = useRef(false);
   const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Same cleanup as the day screen: this tab unmounts on a tab switch, and a
+  // pending toast timer would then call setToast on a dead component.
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    };
+  }, []);
+
   const today = days.find((day) => day.dateKey === toDateKey(new Date()));
+
+  function showToast(message: string, failed = false) {
+    setToast({ message, failed });
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    toastTimeoutRef.current = setTimeout(() => setToast(null), TOAST_DURATION_MS);
+  }
 
   async function handleSave() {
     // Synchronous guard: `saving` only disables the button after a
@@ -45,13 +59,16 @@ export default function Log() {
     setSaving(true);
     try {
       await addMoodEntry(score, note);
-      setThankYou(getThankYouMessage(score, language));
+      showToast(getThankYouMessage(score, language));
       setScore(null);
       setNote('');
-      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-      toastTimeoutRef.current = setTimeout(() => setThankYou(null), TOAST_DURATION_MS);
     } catch (err) {
+      // A save can genuinely fail — the store refuses to write when it
+      // couldn't read what's already stored — and silently clearing the
+      // spinner would look like it worked, so say so and keep what was
+      // typed.
       console.error('Failed to save entry', err);
+      showToast(t('checkIn.saveError'), true);
     } finally {
       savingRef.current = false;
       setSaving(false);
@@ -126,7 +143,11 @@ export default function Log() {
         />
       </View>
 
-      <Toast message={thankYou} accentColor={palette.accents.checkIn} insetBottom={insets.bottom} />
+      <Toast
+        message={toast?.message ?? null}
+        accentColor={toast?.failed ? palette.danger : palette.accents.checkIn}
+        insetBottom={insets.bottom}
+      />
     </KeyboardAvoidingView>
   );
 }

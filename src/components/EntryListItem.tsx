@@ -7,13 +7,15 @@ import type { MoodEntry } from '../types';
 
 interface EntryListItemProps {
   entry: MoodEntry;
+  onEdit?: () => void;
   onDelete?: () => void;
 }
 
-export function EntryListItem({ entry, onDelete }: EntryListItemProps) {
+export function EntryListItem({ entry, onEdit, onDelete }: EntryListItemProps) {
   const { palette } = useTheme();
   const { language, t } = useI18n();
   const styles = createStyles(palette);
+  const time = formatTime(entry.timestamp, language);
 
   return (
     <View style={styles.row}>
@@ -22,17 +24,33 @@ export function EntryListItem({ entry, onDelete }: EntryListItemProps) {
       </View>
       <View style={styles.body}>
         {entry.note ? <Text style={styles.note}>{entry.note}</Text> : null}
-        <Text style={styles.time}>{formatTime(entry.timestamp, language)}</Text>
+        <Text style={styles.time}>
+          {time}
+          {entry.updatedAt ? ` · ${t('dayDetail.edited')}` : ''}
+        </Text>
       </View>
-      {onDelete ? (
-        <Pressable
-          onPress={onDelete}
-          hitSlop={8}
-          accessibilityLabel={t('dayDetail.deleteEntryLabel')}
-        >
-          <Text style={styles.delete}>{t('common.delete')}</Text>
-        </Pressable>
-      ) : null}
+      <View style={styles.actions}>
+        {onEdit ? (
+          <Pressable
+            onPress={onEdit}
+            style={styles.actionButton}
+            accessibilityRole="button"
+            accessibilityLabel={t('dayDetail.editEntryLabel', { score: entry.score, time })}
+          >
+            <Text style={styles.edit}>{t('common.edit')}</Text>
+          </Pressable>
+        ) : null}
+        {onDelete ? (
+          <Pressable
+            onPress={onDelete}
+            style={styles.actionButton}
+            accessibilityRole="button"
+            accessibilityLabel={t('dayDetail.deleteEntryLabel', { score: entry.score, time })}
+          >
+            <Text style={styles.delete}>{t('common.delete')}</Text>
+          </Pressable>
+        ) : null}
+      </View>
     </View>
   );
 }
@@ -72,6 +90,25 @@ function createStyles(colors: Palette) {
     time: {
       fontSize: 12,
       color: colors.inkMuted,
+    },
+    actions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    // The labels are 12px text, so the tappable box has to come from padding
+    // rather than `hitSlop` — hitSlop is a no-op in react-native-web, and one
+    // of these two buttons is destructive. The gap then stays a real dead
+    // zone between them instead of two hit rectangles meeting in the middle.
+    actionButton: {
+      minHeight: 44,
+      justifyContent: 'center',
+      paddingHorizontal: spacing.sm,
+    },
+    edit: {
+      fontSize: 12,
+      color: colors.sageDark,
+      fontWeight: '600',
     },
     delete: {
       fontSize: 12,
