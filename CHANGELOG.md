@@ -3,21 +3,38 @@
 All notable changes to Vane Bunny are documented here. Format loosely
 follows [Keep a Changelog](https://keepachangelog.com/).
 
-## 1.1.1 — 2026-08-20
+## 1.1.2 — 2026-08-21
 
 ### Fixed
 
-- **Complete data loss when upgrading from 1.0.3 to 1.1.0.** The async-storage
-  downgrade (3.1.1 → 2.2.0) silently switched database files on Android:
-  v1.0.0–1.0.3 wrote to Room DB (`AsyncStorage`), but v1.1.0 looked for data
-  in the legacy SQLite file (`RKStorage`), which was never created, rendering
-  all stored check-ins, language, and theme settings unreachable. Enable
-  AsyncStorage's `next` storage via `expo-build-properties`, pointing the
-  native module back at the Room DB. On first launch, the v2 native layer
-  auto-migrates from `RKStorage` (if present) to `AsyncStorage`, recovering
-  any data written by 1.1.0 and making the app see its original entries again.
-  Users upgrading from 1.0.3 → 1.1.1 get all data back; users who upgraded to
-  1.1.0 find theirs reappears on first launch of 1.1.1.
+- **The v1.1.1 fix did not actually work.** The `expo-build-properties`
+  plugin (v57.0.12) silently ignores custom `gradleProperties` -- it only
+  maps a fixed set of known properties (minSdkVersion, compileSdkVersion,
+  etc.) to `gradle.properties`. The `AsyncStorage_useNextStorage: "true"`
+  entry in its config was accepted by schema validation but never written
+  to the generated `gradle.properties` file.
+- Replaced the non-functional `expo-build-properties` config with a custom
+  Expo config plugin (`plugins/withAsyncStorageNextStorage.js`) that uses
+  `withGradleProperties` from `expo/config-plugins` to correctly inject
+  `AsyncStorage_useNextStorage=true` into `gradle.properties`. This makes
+  async-storage v2.2.0 use `StorageModule.kt` / `StorageSupplier.kt`,
+  which reads from the Room database named `AsyncStorage` -- the same
+  database that async-storage v3.1.1 wrote all user data to in versions
+  1.0.0 through 1.0.3.
+
+## 1.1.1 — 2026-08-20
+
+### Fixed (insufficient -- see 1.1.2)
+
+- **Attempted to fix data loss from 1.1.0 upgrade by setting
+  `AsyncStorage_useNextStorage=true` via `expo-build-properties`.** The
+  root cause was correctly identified (the async-storage downgrade
+  switched from Room DB to legacy SQLite), but the chosen mechanism did
+  not work: `expo-build-properties` does not propagate arbitrary
+  `gradleProperties` to the build. The property never reached
+  `gradle.properties`, so async-storage v2 continued using the empty
+  `RKStorage` SQLite file. Superseded by the custom config plugin in
+  1.1.2.
 
 ## 1.1.0 — 2026-08-15
 
@@ -77,11 +94,16 @@ that build.
   `@react-native-async-storage/async-storage` 3.1.1 → 2.2.0 and
   `react-native-gesture-handler` 3.1.0 → 2.32.0; `react-native`,
   `expo`, `expo-router`, `react-native-safe-area-context` and friends
-  moved to their pinned patch/minor. **No stored data is affected by the
-  async-storage downgrade:** that package's v3 default export is
-  `getLegacyStorage()`, the v2-backed implementation, so the app has been
-  reading and writing the v2 store all along. Native version ranges are
-  now `~`/exact rather than `^`, which is what let them drift in the
+  moved to their pinned patch/minor. **Note:** The async-storage
+  downgrade DID silently switch storage backends on Android. While v3's
+  default export is `getLegacyStorage()`, its native Android
+  implementation uses a Room database named `AsyncStorage`, not the old
+  SQLite file `RKStorage`. Downgrading to v2 (without the
+  `AsyncStorage_useNextStorage` flag) switched the app to
+  `ReactDatabaseSupplier.java`, which reads from `RKStorage` -- a file
+  that was never created by v3 -- causing all previously stored data to
+  become invisible. See v1.1.2 for the proper fix. Native version ranges
+  are now `~`/exact rather than `^`, which is what let them drift in the
   first place.
 - The check-in screen's "Save check-in" button is now pinned to the bottom
   of the screen instead of sitting at the end of the scroll content, so it
