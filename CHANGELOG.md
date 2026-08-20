@@ -3,6 +3,22 @@
 All notable changes to Vane Bunny are documented here. Format loosely
 follows [Keep a Changelog](https://keepachangelog.com/).
 
+## 1.1.1 — 2026-08-20
+
+### Fixed
+
+- **Complete data loss when upgrading from 1.0.3 to 1.1.0.** The async-storage
+  downgrade (3.1.1 → 2.2.0) silently switched database files on Android:
+  v1.0.0–1.0.3 wrote to Room DB (`AsyncStorage`), but v1.1.0 looked for data
+  in the legacy SQLite file (`RKStorage`), which was never created, rendering
+  all stored check-ins, language, and theme settings unreachable. Enable
+  AsyncStorage's `next` storage via `expo-build-properties`, pointing the
+  native module back at the Room DB. On first launch, the v2 native layer
+  auto-migrates from `RKStorage` (if present) to `AsyncStorage`, recovering
+  any data written by 1.1.0 and making the app see its original entries again.
+  Users upgrading from 1.0.3 → 1.1.1 get all data back; users who upgraded to
+  1.1.0 find theirs reappears on first launch of 1.1.1.
+
 ## 1.1.0 — 2026-08-15
 
 The version in `app.json` moves 1.0.3 → 1.1.0; everything below ships in
