@@ -39,6 +39,16 @@
           "imageWidth": 220,
           "backgroundColor": "#F7F2E9"
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "gradleProperties": {
+              "AsyncStorage_useNextStorage": "true"
+            }
+          }
+        }
       ]
     ],
     "experiments": {
