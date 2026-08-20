@@ -2,7 +2,7 @@
   "expo": {
     "name": "Vane Bunny",
     "slug": "vane-bunny",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "scheme": "vanebunny",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -38,6 +38,16 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 220,
           "backgroundColor": "#F7F2E9"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "gradleProperties": {
+              "AsyncStorage_useNextStorage": "true"
+            }
+          }
         }
       ]
     ],
