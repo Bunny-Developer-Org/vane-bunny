@@ -1,3 +1,5 @@
+import withAsyncStorageNextStorage from '../withAsyncStorageNextStorage';
+
 jest.mock('expo/config-plugins', () => ({
   withGradleProperties: jest.fn((config, callback) => {
     // Simulate Expo's mod system: call the callback with the config
@@ -5,17 +7,15 @@ jest.mock('expo/config-plugins', () => ({
   }),
 }));
 
-const withAsyncStorageNextStorage = require('../withAsyncStorageNextStorage');
-
 describe('withAsyncStorageNextStorage', () => {
   it('adds AsyncStorage_useNextStorage=true to modResults', () => {
     const config = {
       name: 'TestApp',
       slug: 'test-app',
-      modResults: [] as Array<{ type: string; key: string; value: string }>,
+      modResults: [] as { type: string; key: string; value: string }[],
     };
 
-    const result = withAsyncStorageNextStorage(config);
+    const result = withAsyncStorageNextStorage(config) as typeof config;
 
     expect(result.modResults).toEqual([
       {
@@ -36,7 +36,7 @@ describe('withAsyncStorageNextStorage', () => {
       ],
     };
 
-    const result = withAsyncStorageNextStorage(config);
+    const result = withAsyncStorageNextStorage(config) as typeof config;
 
     // The old entry should be removed and replaced with the new one
     expect(result.modResults).toEqual([
@@ -55,7 +55,7 @@ describe('withAsyncStorageNextStorage', () => {
       ],
     };
 
-    const result = withAsyncStorageNextStorage(config);
+    const result = withAsyncStorageNextStorage(config) as typeof config;
 
     expect(result.modResults).toHaveLength(3);
     expect(result.modResults).toContainEqual({

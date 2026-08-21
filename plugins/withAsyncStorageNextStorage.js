@@ -19,8 +19,7 @@ module.exports = function withAsyncStorageNextStorage(config) {
   return withGradleProperties(config, (modConfig) => {
     // Remove any existing entry to avoid duplicates
     modConfig.modResults = modConfig.modResults.filter(
-      (item) =>
-        !(item.type === 'property' && item.key === 'AsyncStorage_useNextStorage')
+      (item) => !(item.type === 'property' && item.key === 'AsyncStorage_useNextStorage'),
     );
 
     // Add the property
